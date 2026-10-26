@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+/* Token desain dari Figma "M1-K3" (UI Bersama) */
+@theme {
+  --font-heading: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+  --font-inter: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --color-neutral-bg: #f6f8fb;
+  --color-neutral-surface: #ffffff;
+  --color-neutral-line: #d3dae6;
+  --color-neutral-line-strong: #7b89a2;
+  --color-text-default: #0f172a;
+  --color-text-muted: #4b5870;
+  --color-brand-primary: #1f3f7a;
+  --color-brand-primary-soft: #e4ebf8;
+  --color-brand-on-primary: #ffffff;
+
+  --radius-card: 10px;
+  --radius-field: 6px;
+
+  --shadow-card: 0px 2px 8px 0px rgba(15, 23, 42, 0.04),
+    0px 6px 20px 0px rgba(15, 23, 42, 0.12);
+}
+
+body {
+  @apply bg-neutral-bg font-body text-text-default antialiased;
+}
