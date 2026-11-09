@@ -16,6 +16,7 @@ export default defineConfig(({ mode }) => {
     server: {
       // Saat `npm run dev`, panggilan /api diteruskan ke backend M1
       // sehingga tidak perlu pengaturan CORS di lokal.
+      // ubah localhost:8080 ke backend M1 jika ingin mengakses langsung.
       proxy: {
         "/api": {
           target: env.VITE_BACKEND_URL || "https://ppl-m1-be-pied.vercel.app",
