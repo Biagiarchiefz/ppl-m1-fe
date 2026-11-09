@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Varian dark: mengikuti atribut data-theme, bukan langsung setelan sistem. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 /* Token desain dari Figma "M1-K3" (UI Bersama) */
 @theme {
   --font-heading: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
@@ -16,11 +19,48 @@
   --color-brand-primary-soft: #e4ebf8;
   --color-brand-on-primary: #ffffff;
 
+  /* Tambahan untuk tema gelap. Nilai terang sama dengan warna sebelumnya. */
+  --color-neutral-soft: #f1f5f9;
+  --color-brand-primary-strong: #172f5e;
+  --color-header: #1f3f7a;
+  --color-header-strong: #172f5e;
+  --color-success: #166534;
+  --color-success-soft: #dcfce7;
+  --color-danger: #dc2626;
+  --color-danger-soft: #fef2f2;
+  --color-danger-line: #fecaca;
+
   --radius-card: 10px;
   --radius-field: 6px;
 
   --shadow-card: 0px 2px 8px 0px rgba(15, 23, 42, 0.04),
     0px 6px 20px 0px rgba(15, 23, 42, 0.12);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-neutral-bg: #12161f;
+  --color-neutral-surface: #1a202c;
+  --color-neutral-soft: #2a3242;
+  --color-neutral-line: #2d3648;
+  --color-neutral-line-strong: #7b89a2;
+  --color-text-default: #e6eaf2;
+  --color-text-muted: #a3aec2;
+  --color-brand-primary: #8fb0ee;
+  --color-brand-primary-strong: #a8c3f5;
+  --color-brand-primary-soft: #233252;
+  --color-brand-on-primary: #0f1a30;
+  --color-header: #151c2b;
+  --color-header-strong: #2a3242;
+  --color-success: #86efac;
+  --color-success-soft: #14532d;
+  --color-danger: #f87171;
+  --color-danger-soft: #3b1d22;
+  --color-danger-line: #7f1d1d;
+
+  --shadow-card: 0px 2px 8px 0px rgba(0, 0, 0, 0.25),
+    0px 6px 20px 0px rgba(0, 0, 0, 0.35);
 }
 
 body {

@@ -1,19 +1,22 @@
 import { Navigate, Outlet, useLocation } from "react-router";
+import { can, getSessionUser, getToken } from "../features/auth/auth.Slice";
 
 interface ProtectedRouteProps {
-  allowedRoles?: string[];
+  // Lolos bila pengguna memiliki salah satu izin ini.
+  anyPermission?: string[];
 }
 
-const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
+// Menu dan rute disembunyikan di UI berdasarkan izin di token, tetapi hak
+// akses tetap dijaga backend (403 FORBIDDEN).
+const ProtectedRoute = ({ anyPermission }: ProtectedRouteProps) => {
   const location = useLocation();
-  const token = localStorage.getItem("auth_token");
-  const role = localStorage.getItem("auth_role") ?? "user";
+  const user = getSessionUser();
 
-  if (!token) {
+  if (!getToken() || !user) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(role)) {
+  if (anyPermission && !can(user, ...anyPermission)) {
     return <Navigate to="/forbidden" replace state={{ from: location }} />;
   }
 

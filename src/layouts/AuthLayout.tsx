@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from "react";
+import ThemeToggle from "../components/common/ThemeToggle/ThemeToggle";
 import blobBl from "../assets/login/blob-bl.svg";
 import blobBr from "../assets/login/blob-br.svg";
 import blobCenter from "../assets/login/blob-center.svg";
@@ -37,22 +38,24 @@ const AuthLayout = ({
   return (
     <main className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-linear-to-r from-neutral-bg to-brand-primary-soft px-4 py-12">
     {blobs.map(([src, className, inset]) => (
-      <div key={src} aria-hidden className={`pointer-events-none absolute ${className}`}>
+      <div key={src} aria-hidden className={`pointer-events-none absolute dark:opacity-10 ${className}`}>
         <div className={`absolute ${inset}`}>
           <img alt="" className="block size-full max-w-none" src={src} />
         </div>
       </div>
     ))}
 
+    <ThemeToggle className="absolute right-4 top-4 z-10 bg-neutral-surface text-text-muted shadow-card hover:bg-neutral-soft" />
+
     <div className="relative flex w-full max-w-[880px] flex-col overflow-clip rounded-card border border-neutral-line bg-neutral-surface shadow-card md:flex-row">
       <div className="flex flex-col justify-center gap-6 p-8 sm:p-12 md:w-1/2">
         {children}
       </div>
 
-      <div className="relative flex flex-col justify-center gap-6 overflow-clip bg-brand-primary p-8 sm:p-12 md:w-1/2">
+      <div className="relative flex flex-col justify-center gap-6 overflow-clip bg-header p-8 sm:p-12 md:w-1/2">
         <img alt="" aria-hidden className="absolute top-[-80px] left-[280px] size-[220px]" src={decoCircle1} />
         <img alt="" aria-hidden className="absolute top-[260px] left-[320px] size-[180px]" src={decoCircle2} />
-        <div className="relative flex flex-col gap-6 text-brand-on-primary">
+        <div className="relative flex flex-col gap-6 text-white">
           <p className="font-heading text-[32px] leading-10 font-extrabold">{sideTitle}</p>
           <p className="text-base leading-6 opacity-85">{sideDescription}</p>
         </div>

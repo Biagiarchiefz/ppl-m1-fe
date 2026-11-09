@@ -13,6 +13,8 @@ interface PropTypes {
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
   showPasswordToggle?: boolean;
+  error?: string;
+  hint?: string;
 }
 
 const Input = (props: PropTypes) => {
@@ -27,7 +29,10 @@ const Input = (props: PropTypes) => {
     onChange,
     placeholder,
     showPasswordToggle = false,
+    error,
+    hint,
   } = props;
+  const messageId = `${id}-message`;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const isPassword = type === "password";
   const inputType =
@@ -43,7 +48,7 @@ const Input = (props: PropTypes) => {
       >
         {label}
       </label>
-      <div className="flex h-10 items-center gap-3 rounded-field border border-neutral-line-strong bg-neutral-surface px-3 focus-within:border-brand-primary focus-within:ring-2 focus-within:ring-brand-primary/20">
+      <div className={`flex h-10 items-center gap-3 rounded-field border bg-neutral-surface px-3 focus-within:ring-2 ${error ? "border-danger focus-within:ring-danger/20" : "border-neutral-line-strong focus-within:border-brand-primary focus-within:ring-brand-primary/20"}`}>
         {Icon && (
           <span className="flex size-5 shrink-0 items-center justify-center">
             <Icon size={20} strokeWidth={1.6} aria-hidden />
@@ -58,6 +63,8 @@ const Input = (props: PropTypes) => {
           value={value}
           onChange={onChange}
           placeholder={placeholder}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error || hint ? messageId : undefined}
           className="min-w-0 flex-1 bg-transparent text-sm leading-[22px] text-text-default outline-none placeholder:text-text-muted"
         />
         {isPassword && showPasswordToggle && (
@@ -74,6 +81,11 @@ const Input = (props: PropTypes) => {
           </Button>
         )}
       </div>
+      {(error || hint) && (
+        <p id={messageId} className={`text-xs leading-5 ${error ? "text-danger" : "text-text-muted"}`}>
+          {error ?? hint}
+        </p>
+      )}
     </div>
   );
 };

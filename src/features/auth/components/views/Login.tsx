@@ -1,20 +1,40 @@
 import { useState, type FormEvent } from "react";
 import { Check, LockKeyhole, Mail } from "lucide-react";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import divider from "../../../../assets/login/divider.svg";
 import Input from "../../../../components/common/Input/Input";
 import Button from "../../../../components/common/Button/Button";
+import Alert from "../../../../components/common/Alert/Alert";
+import { ApiError } from "../../../../services/api";
+import { homePath } from "../../../../routes/homePath";
+import { saveSession } from "../../auth.Slice";
+import { login } from "../..";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [identifier, setIdentifier] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [fields, setFields] = useState<Record<string, string>>({});
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    localStorage.setItem("auth_token", "demo-token");
-    navigate("/dashboard");
+    setLoading(true);
+    setError("");
+    setFields({});
+    try {
+      const result = await login(email, password);
+      saveSession(result.access_token, result.user, remember);
+      navigate(homePath(), { replace: true });
+    } catch (err) {
+      const apiError = err instanceof ApiError ? err : null;
+      setError(apiError?.message ?? "Terjadi kesalahan pada server");
+      setFields(apiError?.fields ?? {});
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -27,17 +47,20 @@ const Login = () => {
           Gunakan akun yang telah terdaftar untuk melanjutkan.
         </p>
       </div>
-      <img alt="" aria-hidden className="block h-px w-full" src={divider} />
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <img alt="" aria-hidden className="block h-px w-full dark:opacity-20" src={divider} />
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+        {error && <Alert>{error}</Alert>}
         <Input
-          label="Email atau nama pengguna"
+          label="Email"
           icon={Mail}
-          id="identifier"
-          name="identifier"
+          id="email"
+          name="email"
+          type="email"
           autoComplete="username"
-          value={identifier}
-          onChange={(e) => setIdentifier(e.target.value)}
-          placeholder="Masukkan email atau nama pengguna"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Masukkan email"
+          error={fields.email}
         />
         <Input
           label="Kata sandi"
@@ -50,36 +73,27 @@ const Login = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Masukkan kata sandi"
+          error={fields.password}
         />
-        <div className="flex items-center justify-between">
-          <label className="flex cursor-pointer items-center gap-3">
-            <input
-              type="checkbox"
-              checked={remember}
-              onChange={(e) => setRemember(e.target.checked)}
-              className="peer sr-only"
-            />
-            <span className="flex size-4 items-center justify-center rounded-[4px] border border-[#757575] bg-white peer-checked:border-[#2c2c2c] peer-checked:bg-[#2c2c2c] peer-focus-visible:ring-2 peer-focus-visible:ring-brand-primary/40 [&>svg]:invisible peer-checked:[&>svg]:visible">
-              <Check size={16} strokeWidth={1.6} aria-hidden />
-            </span>
-            <span className="font-inter text-base leading-[1.4] text-[#1e1e1e]">
-              Ingat saya
-            </span>
-          </label>
-          <a href="#" className="text-sm leading-[22px] text-brand-primary hover:underline">
-            Lupa kata sandi?
-          </a>
-        </div>
-        <Button
-          type="submit"
-        >
-          Masuk
+        <label className="flex cursor-pointer items-center gap-3">
+          <input
+            type="checkbox"
+            checked={remember}
+            onChange={(e) => setRemember(e.target.checked)}
+            className="peer sr-only"
+          />
+          <span className="flex size-4 items-center justify-center rounded-[4px] border border-neutral-line-strong bg-neutral-surface text-brand-on-primary peer-checked:border-brand-primary peer-checked:bg-brand-primary peer-focus-visible:ring-2 peer-focus-visible:ring-brand-primary/40 [&>svg]:invisible peer-checked:[&>svg]:visible">
+            <Check size={16} strokeWidth={1.6} aria-hidden />
+          </span>
+          <span className="font-inter text-base leading-[1.4] text-text-default">
+            Ingat saya
+          </span>
+        </label>
+        <Button type="submit" disabled={loading} className="disabled:cursor-wait disabled:opacity-70">
+          {loading ? "Memproses..." : "Masuk"}
         </Button>
-        <p className="flex items-center justify-center gap-1 text-sm text-text-muted">
-          Belum punya akun?
-          <Link to="/register" className="font-semibold text-brand-primary hover:underline">
-            Daftar
-          </Link>
+        <p className="text-center text-sm text-text-muted">
+          Belum punya akun? Hubungi administrator.
         </p>
       </form>
     </>
