@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => {
       // sehingga tidak perlu pengaturan CORS di lokal.
       proxy: {
         "/api": {
-          target: env.VITE_BACKEND_URL || "http://localhost:8080",
+          target: env.VITE_BACKEND_URL || "https://ppl-m1-be-pied.vercel.app",
           changeOrigin: true,
         },
       },
