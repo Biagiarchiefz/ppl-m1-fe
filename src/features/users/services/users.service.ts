@@ -1,41 +1,5 @@
-import { apiList, apiRequest } from "../../services/api";
-
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  division: string | null;
-  unit_usaha_id: number | null;
-  is_active: boolean;
-  created_at: string;
-}
-
-export interface Reference {
-  code: string;
-  name: string;
-}
-
-export interface UserFilter {
-  page: number;
-  per_page?: number;
-  q?: string;
-  role?: string;
-  division?: string;
-  is_active?: boolean;
-  sort?: string;
-}
-
-export interface CreateUserInput {
-  name: string;
-  email: string;
-  password: string;
-  role: string;
-  division: string | null;
-  unit_usaha_id: number | null;
-}
-
-export type UpdateUserInput = Partial<Omit<CreateUserInput, "email" | "password">>;
+import { apiList, apiRequest } from "../../../services/api";
+import type { CreateUserInput, UpdateUserInput, User, UserFilter } from "../../../types";
 
 export function listUsers(filter: UserFilter) {
   return apiList<User>("/users", { ...filter });
@@ -61,3 +25,8 @@ export function activateUser(id: number) {
 export function deleteUser(id: number) {
   return apiRequest<{ id: number; deleted: boolean }>(`/users/${id}/permanent`, { method: "DELETE" });
 }
+
+export const userKeys = {
+  all: ["users"] as const,
+  list: (filter: UserFilter) => ["users", "list", filter] as const,
+};

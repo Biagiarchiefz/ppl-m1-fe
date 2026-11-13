@@ -15,12 +15,13 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router";
-import Logo from "../../components/common/Logo/Logo";
-import ThemeToggle from "../../components/common/ThemeToggle/ThemeToggle";
-import Tooltip from "../../components/common/Tooltip/Tooltip";
-import { ADMIN_AREA_PERMS, PERM } from "../../config/env";
-import { can, clearSession, getSessionUser, type SessionUser } from "../../features/auth/auth.Slice";
-import ProfileMenu from "../../features/auth/components/ProfileMenu";
+import Logo from "../components/common/Logo/Logo";
+import ThemeToggle from "../components/common/ThemeToggle/ThemeToggle";
+import Tooltip from "../components/common/Tooltip/Tooltip";
+import { ADMIN_AREA_PERMS, PERM } from "../config/env";
+import { can, useAuthStore } from "../features/auth/stores/auth.store";
+import ProfileMenu from "../features/auth/components/ProfileMenu";
+import type { SessionUser } from "../types";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -184,7 +185,8 @@ const Sidebar = ({ user, collapsed = false, onToggleCollapse, onNavigate, onClos
 const AdminLayout = ({ children }: AdminLayoutProps) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const user = getSessionUser();
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
   const [collapsed, setCollapsed] = useState(readCollapsed);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const page = activePage(user, location.pathname);
@@ -206,7 +208,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   }
 
   function handleLogout() {
-    clearSession();
+    logout();
     navigate("/login", { replace: true });
   }
 

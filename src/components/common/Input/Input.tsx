@@ -1,7 +1,9 @@
-import { useState, type ChangeEvent } from "react";
+import { useState, type ChangeEventHandler, type FocusEventHandler, type Ref } from "react";
 import { Eye, EyeOff, type LucideIcon } from "lucide-react";
 import Button from "../Button/Button";
 
+// Bisa dipakai terkontrol (value + onChange) atau langsung dengan
+// react-hook-form: <Input {...register("email")} /> (name, onChange, onBlur, ref).
 interface PropTypes {
   label: string;
   icon?: LucideIcon;
@@ -9,8 +11,10 @@ interface PropTypes {
   name?: string;
   type?: string;
   autoComplete?: string;
-  value: string;
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  value?: string;
+  onChange?: ChangeEventHandler<HTMLInputElement>;
+  onBlur?: FocusEventHandler<HTMLInputElement>;
+  ref?: Ref<HTMLInputElement>;
   placeholder?: string;
   showPasswordToggle?: boolean;
   error?: string;
@@ -27,6 +31,8 @@ const Input = (props: PropTypes) => {
     autoComplete,
     value,
     onChange,
+    onBlur,
+    ref,
     placeholder,
     showPasswordToggle = false,
     error,
@@ -59,8 +65,10 @@ const Input = (props: PropTypes) => {
           type={inputType}
           autoComplete={autoComplete}
           required
+          ref={ref}
           value={value}
           onChange={onChange}
+          onBlur={onBlur}
           placeholder={placeholder}
           aria-invalid={Boolean(error)}
           aria-describedby={error || hint ? messageId : undefined}

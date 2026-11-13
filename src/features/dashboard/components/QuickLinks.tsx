@@ -1,6 +1,6 @@
 import { ChevronRight, FolderTree, History, Shield, Users, type LucideIcon } from "lucide-react";
 import { Link } from "react-router";
-import type { DashboardAccess } from "..";
+import type { DashboardAccess } from "../../../types";
 
 interface QuickLink {
   to: string;

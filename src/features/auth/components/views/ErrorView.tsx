@@ -1,7 +1,6 @@
 import { ArrowLeft, type LucideIcon } from "lucide-react";
-import { useNavigate } from "react-router";
 import Button from "../../../../components/common/Button/Button";
-import { homePath } from "../../../../routes/homePath";
+import { useErrorView } from "../../hooks/useErrorView";
 
 interface ErrorViewProps {
   code: string;
@@ -11,7 +10,7 @@ interface ErrorViewProps {
 }
 
 const ErrorView = ({ code, title, description, icon: Icon }: ErrorViewProps) => {
-  const navigate = useNavigate();
+  const { goHome } = useErrorView();
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-neutral-bg px-4">
@@ -39,7 +38,7 @@ const ErrorView = ({ code, title, description, icon: Icon }: ErrorViewProps) => 
           <div className="my-4 h-px w-full bg-neutral-line" />
           <Button
             type="button"
-            onClick={() => navigate(homePath(), { replace: true })}
+            onClick={goHome}
             size="sm"
           >
             <ArrowLeft size={14} strokeWidth={2} aria-hidden />

@@ -1,23 +1,8 @@
-import { listAuditLogs, type AuditLog } from "../audit";
-import { listDivisions } from "../divisions";
-import { listRoles } from "../roles";
-import { listUsers } from "../users";
-
-export interface DashboardAccess {
-  users: boolean;
-  roles: boolean;
-  divisions: boolean;
-  audit: boolean;
-}
-
-// null = tidak punya izin atau permintaan gagal; kartunya menampilkan "—".
-export interface DashboardStats {
-  totalUsers: number | null;
-  activeUsers: number | null;
-  activeRoles: number | null;
-  activeDivisions: number | null;
-  recentLogs: AuditLog[] | null;
-}
+import { listAuditLogs } from "../../audit/services/audit.service";
+import { listDivisions } from "../../divisions/services/divisions.service";
+import { listRoles } from "../../roles/services/roles.service";
+import { listUsers } from "../../users/services/users.service";
+import type { DashboardAccess, DashboardStats } from "../../../types";
 
 async function totalOf(enabled: boolean, request: () => Promise<{ meta: { total: number } }>): Promise<number | null> {
   if (!enabled) return null;
@@ -44,3 +29,7 @@ export async function fetchDashboardStats(access: DashboardAccess): Promise<Dash
   ]);
   return { totalUsers, activeUsers, activeRoles, activeDivisions, recentLogs };
 }
+
+export const dashboardKeys = {
+  stats: (access: DashboardAccess) => ["dashboard", "stats", access] as const,
+};

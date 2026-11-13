@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from "react-router";
-import { can, getSessionUser, getToken } from "../features/auth/auth.Slice";
+import { can, useAuthStore } from "../features/auth/stores/auth.store";
 
 interface ProtectedRouteProps {
   // Lolos bila pengguna memiliki salah satu izin ini.
@@ -10,9 +10,10 @@ interface ProtectedRouteProps {
 // akses tetap dijaga backend (403 FORBIDDEN).
 const ProtectedRoute = ({ anyPermission }: ProtectedRouteProps) => {
   const location = useLocation();
-  const user = getSessionUser();
+  const token = useAuthStore((s) => s.token);
+  const user = useAuthStore((s) => s.user);
 
-  if (!getToken() || !user) {
+  if (!token || !user) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 

@@ -1,10 +1,9 @@
-import { useState } from "react";
 import { UserX } from "lucide-react";
 import Modal, { ModalFooter } from "../../../components/common/Modal/Modal";
 import Button from "../../../components/common/Button/Button";
 import Alert from "../../../components/common/Alert/Alert";
-import { ApiError } from "../../../services/api";
-import { deactivateUser, type User } from "..";
+import { useDeactivateUser } from "../hooks/useDeactivateUser";
+import type { User } from "../../../types";
 
 interface DeactivateDialogProps {
   user: User;
@@ -14,21 +13,7 @@ interface DeactivateDialogProps {
 
 // Dialog konfirmasi sebelum DELETE /users/{id} (soft delete, PRD 11).
 const DeactivateDialog = ({ user, onClose, onDone }: DeactivateDialogProps) => {
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  async function handleConfirm() {
-    setLoading(true);
-    setError("");
-    try {
-      await deactivateUser(user.id);
-      onDone(`Akun ${user.name} berhasil dinonaktifkan.`);
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Terjadi kesalahan pada server");
-    } finally {
-      setLoading(false);
-    }
-  }
+  const { error, loading, handleConfirm } = useDeactivateUser(user, onDone);
 
   return (
     <Modal title="Nonaktifkan akun" icon={UserX} tone="danger" size="sm" onClose={onClose}>

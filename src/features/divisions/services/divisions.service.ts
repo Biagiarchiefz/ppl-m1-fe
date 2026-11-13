@@ -1,12 +1,5 @@
-import { apiList, apiRequest } from "../../services/api";
-
-export interface Division {
-  id: number;
-  code: string;
-  name: string;
-  is_active: boolean;
-  created_at: string;
-}
+import { apiList, apiRequest } from "../../../services/api";
+import type { Division } from "../../../types";
 
 export function listDivisions(params: { page?: number; per_page?: number; is_active?: boolean }) {
   return apiList<Division>("/divisions", { ...params });
@@ -27,3 +20,8 @@ export function activateDivision(id: number) {
 export function deactivateDivision(id: number) {
   return apiRequest<{ id: number; is_active: boolean }>(`/divisions/${id}`, { method: "DELETE" });
 }
+
+export const divisionKeys = {
+  all: ["divisions"] as const,
+  list: (params: Parameters<typeof listDivisions>[0]) => ["divisions", "list", params] as const,
+};

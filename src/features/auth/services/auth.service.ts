@@ -1,18 +1,5 @@
-import { apiRequest } from "../../services/api";
-import type { SessionUser } from "./auth.Slice";
-
-export interface LoginResult {
-  access_token: string;
-  token_type: string;
-  expires_in: number;
-  user: SessionUser;
-}
-
-export interface Me extends SessionUser {
-  email: string;
-  organization_name: string | null;
-  is_active: boolean;
-}
+import { apiRequest } from "../../../services/api";
+import type { LoginResult, Me } from "../../../types";
 
 export function login(email: string, password: string) {
   return apiRequest<LoginResult>("/auth/login", {
@@ -32,3 +19,7 @@ export function changePassword(oldPassword: string, newPassword: string) {
     body: { old_password: oldPassword, new_password: newPassword },
   });
 }
+
+export const authKeys = {
+  me: ["auth", "me"] as const,
+};

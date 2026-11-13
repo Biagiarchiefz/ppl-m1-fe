@@ -1,6 +1,5 @@
 import { useState } from "react";
-
-export type Theme = "light" | "dark";
+import type { Theme } from "../types";
 
 // Tema awal dipasang oleh skrip di index.html: pilihan tersimpan, atau setelan
 // sistem bila belum pernah memilih.

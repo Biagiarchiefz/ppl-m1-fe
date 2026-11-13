@@ -1,4 +1,4 @@
-import type { ListMeta } from "../../../services/api";
+import type { ListMeta } from "../../../types";
 
 interface PaginationProps {
   meta: ListMeta | null;

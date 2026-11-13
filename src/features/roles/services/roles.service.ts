@@ -1,28 +1,5 @@
-import { apiList, apiRequest } from "../../services/api";
-
-export interface Role {
-  id: number;
-  code: string;
-  name: string;
-  description: string | null;
-  is_system: boolean;
-  is_active: boolean;
-  permissions: string[];
-  created_at: string;
-}
-
-export interface Permission {
-  code: string;
-  module: string;
-  description: string;
-}
-
-export interface RoleInput {
-  code?: string;
-  name: string;
-  description: string | null;
-  permissions: string[];
-}
+import { apiList, apiRequest } from "../../../services/api";
+import type { Permission, Role, RoleInput } from "../../../types";
 
 export function listRoles(params: { page?: number; per_page?: number; is_active?: boolean }) {
   return apiList<Role>("/roles", { ...params });
@@ -48,3 +25,9 @@ export function activateRole(id: number) {
 export function deactivateRole(id: number) {
   return apiRequest<{ id: number; is_active: boolean }>(`/roles/${id}`, { method: "DELETE" });
 }
+
+export const roleKeys = {
+  all: ["roles"] as const,
+  list: (params: Parameters<typeof listRoles>[0]) => ["roles", "list", params] as const,
+  permissions: ["roles", "permissions"] as const,
+};

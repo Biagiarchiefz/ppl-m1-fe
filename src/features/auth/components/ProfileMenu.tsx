@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, LogOut, UserRound } from "lucide-react";
 import { useNavigate } from "react-router";
-import type { SessionUser } from "../auth.Slice";
+import type { SessionUser } from "../../../types";
 
 interface ProfileMenuProps {
   user: SessionUser | null;

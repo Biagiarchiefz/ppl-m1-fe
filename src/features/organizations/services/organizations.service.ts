@@ -1,18 +1,5 @@
-import { apiList, apiRequest } from "../../services/api";
-
-export interface Organization {
-  id: number;
-  code: string;
-  name: string;
-  is_active: boolean;
-  created_at: string;
-}
-
-export interface CreateOrganizationInput {
-  code: string;
-  name: string;
-  admin: { name: string; email: string; password: string };
-}
+import { apiList, apiRequest } from "../../../services/api";
+import type { CreateOrganizationInput, Organization } from "../../../types";
 
 export function listOrganizations(params: { page: number; q?: string; is_active?: boolean }) {
   return apiList<Organization>("/organizations", { ...params });
@@ -42,3 +29,8 @@ export function activateOrganization(id: number) {
 export function deleteOrganization(id: number) {
   return apiRequest<{ id: number; deleted: boolean }>(`/organizations/${id}/permanent`, { method: "DELETE" });
 }
+
+export const organizationKeys = {
+  all: ["organizations"] as const,
+  list: (params: Parameters<typeof listOrganizations>[0]) => ["organizations", "list", params] as const,
+};

@@ -1,11 +1,11 @@
-import { useState, type FormEvent } from "react";
 import { Shield } from "lucide-react";
+import { Controller } from "react-hook-form";
 import Modal, { ModalFooter } from "../../../components/common/Modal/Modal";
 import Input from "../../../components/common/Input/Input";
 import Button from "../../../components/common/Button/Button";
 import Alert from "../../../components/common/Alert/Alert";
-import { ApiError } from "../../../services/api";
-import { createRole, updateRole, type Permission, type Role } from "..";
+import { groupByModule, togglePermission, useRoleForm } from "../hooks/useRoleForm";
+import type { Permission, Role } from "../../../types";
 
 interface RoleFormModalProps {
   role: Role | null; // null = peran baru
@@ -14,72 +14,49 @@ interface RoleFormModalProps {
   onSaved: (message: string) => void;
 }
 
-function groupByModule(permissions: Permission[]): [string, Permission[]][] {
-  const groups = new Map<string, Permission[]>();
-  permissions.forEach((p) => groups.set(p.module, [...(groups.get(p.module) ?? []), p]));
-  return [...groups.entries()];
-}
-
 const RoleFormModal = ({ role, permissions, onClose, onSaved }: RoleFormModalProps) => {
-  const isEdit = role !== null;
-  const [code, setCode] = useState(role?.code ?? "");
-  const [name, setName] = useState(role?.name ?? "");
-  const [description, setDescription] = useState(role?.description ?? "");
-  const [selected, setSelected] = useState<string[]>(role?.permissions ?? []);
-  const [fields, setFields] = useState<Record<string, string>>({});
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const toggle = (perm: string) =>
-    setSelected((cur) => (cur.includes(perm) ? cur.filter((p) => p !== perm) : [...cur, perm]));
-
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    setFields({});
-    const body = { name, description: description.trim() || null, permissions: selected };
-    try {
-      if (isEdit) await updateRole(role.id, body);
-      else await createRole({ ...body, code });
-      onSaved(isEdit ? "Peran berhasil diperbarui." : "Peran baru berhasil ditambahkan.");
-    } catch (err) {
-      const apiError = err instanceof ApiError ? err : null;
-      setError(apiError?.message ?? "Terjadi kesalahan pada server");
-      setFields(apiError?.fields ?? {});
-    } finally {
-      setLoading(false);
-    }
-  }
+  const { isEdit, register, control, errors, error, loading, onSubmit } = useRoleForm(role, onSaved);
 
   return (
     <Modal title={isEdit ? "Ubah peran" : "Tambah peran"} description="Pilih izin yang dimiliki pengguna dengan peran ini." icon={Shield} size="lg" onClose={onClose}>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+      <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
         {error && <Alert>{error}</Alert>}
         {!isEdit && (
-          <Input label="Kode peran" id="role-code" name="code" value={code} onChange={(e) => setCode(e.target.value.toLowerCase())} placeholder="mis. kasir-toko" error={fields.code} hint="Huruf kecil, angka, - atau _. Tidak bisa diubah setelah dibuat; dipakai di klaim token." />
+          <Controller
+            control={control}
+            name="code"
+            render={({ field }) => (
+              <Input label="Kode peran" id="role-code" name={field.name} ref={field.ref} value={field.value} onBlur={field.onBlur} onChange={(e) => field.onChange(e.target.value.toLowerCase())} placeholder="mis. kasir-toko" error={errors.code?.message} hint="Huruf kecil, angka, - atau _. Tidak bisa diubah setelah dibuat; dipakai di klaim token." />
+            )}
+          />
         )}
-        <Input label="Nama peran" id="role-name" name="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="mis. Kasir Toko" error={fields.name} />
-        <Input label="Deskripsi (opsional)" id="role-desc" name="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Tugas peran ini" />
+        <Input label="Nama peran" id="role-name" placeholder="mis. Kasir Toko" error={errors.name?.message} {...register("name")} />
+        <Input label="Deskripsi (opsional)" id="role-desc" placeholder="Tugas peran ini" {...register("description")} />
 
-        <fieldset className="flex flex-col gap-3">
-          <legend className="mb-2 text-sm font-semibold text-text-default">Izin</legend>
-          {fields.permissions && <p className="text-xs text-danger">{fields.permissions}</p>}
-          {groupByModule(permissions).map(([module, perms]) => (
-            <div key={module} className="rounded-field border border-neutral-line p-3">
-              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-text-subtle">Modul {module}</p>
-              {perms.map((p) => (
-                <label key={p.code} className="flex cursor-pointer items-start gap-2 py-1 text-sm">
-                  <input type="checkbox" checked={selected.includes(p.code)} onChange={() => toggle(p.code)} className="mt-1 accent-brand-primary" />
-                  <span>
-                    <span className="text-text-default">{p.description}</span>
-                    <span className="block font-mono text-xs text-text-muted">{p.code}</span>
-                  </span>
-                </label>
+        <Controller
+          control={control}
+          name="permissions"
+          render={({ field }) => (
+            <fieldset className="flex flex-col gap-3">
+              <legend className="mb-2 text-sm font-semibold text-text-default">Izin</legend>
+              {errors.permissions?.message && <p className="text-xs text-danger">{errors.permissions.message}</p>}
+              {groupByModule(permissions).map(([module, perms]) => (
+                <div key={module} className="rounded-field border border-neutral-line p-3">
+                  <p className="mb-2 text-xs font-bold uppercase tracking-wide text-text-subtle">Modul {module}</p>
+                  {perms.map((p) => (
+                    <label key={p.code} className="flex cursor-pointer items-start gap-2 py-1 text-sm">
+                      <input type="checkbox" checked={field.value.includes(p.code)} onChange={() => field.onChange(togglePermission(field.value, p.code))} className="mt-1 accent-brand-primary" />
+                      <span>
+                        <span className="text-text-default">{p.description}</span>
+                        <span className="block font-mono text-xs text-text-muted">{p.code}</span>
+                      </span>
+                    </label>
+                  ))}
+                </div>
               ))}
-            </div>
-          ))}
-        </fieldset>
+            </fieldset>
+          )}
+        />
 
         <ModalFooter>
           <Button type="button" variant="secondary" onClick={onClose}>

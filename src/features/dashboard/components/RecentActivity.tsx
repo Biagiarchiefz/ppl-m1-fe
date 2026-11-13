@@ -1,7 +1,8 @@
 import { ArrowRight, History } from "lucide-react";
 import { Link } from "react-router";
-import { AUDIT_ACTIONS, type AuditLog } from "../../audit";
+import { AUDIT_ACTIONS } from "../../audit/constants";
 import { formatDateTime } from "../../../utils/formatDate";
+import type { AuditLog } from "../../../types";
 
 interface RecentActivityProps {
   logs: AuditLog[] | null;
