@@ -1,13 +1,7 @@
 import { useEffect, type ReactNode } from "react";
+import Logo from "../components/common/Logo/Logo";
 import ThemeToggle from "../components/common/ThemeToggle/ThemeToggle";
-import blobBl from "../assets/login/blob-bl.svg";
-import blobBr from "../assets/login/blob-br.svg";
-import blobCenter from "../assets/login/blob-center.svg";
-import blobMidAccent from "../assets/login/blob-mid-accent.svg";
-import blobTl from "../assets/login/blob-tl.svg";
-import blobTr from "../assets/login/blob-tr.svg";
-import decoCircle1 from "../assets/login/deco-circle-1.svg";
-import decoCircle2 from "../assets/login/deco-circle-2.svg";
+import { AUTH_PHOTO, unsplashSrcSet, unsplashUrl } from "../utils/unsplash";
 
 interface AuthLayoutProps {
   title: string;
@@ -16,52 +10,68 @@ interface AuthLayoutProps {
   sideDescription?: string;
 }
 
-const blobs = [
-  [blobTl, "left-[-13.89%] top-[-22.22%] h-[700px] w-[780px]", "inset-[-17.14%_-15.38%]"],
-  [blobTr, "left-[62.5%] top-[-20%] h-[620px] w-[700px]", "inset-[-16.13%_-14.29%]"],
-  [blobCenter, "left-[19.44%] top-[22.22%] h-[600px] w-[880px]", "inset-[-23.33%_-15.91%]"],
-  [blobBl, "left-[-11.11%] top-[62.22%] h-[560px] w-[720px]", "inset-[-19.64%_-15.28%]"],
-  [blobBr, "left-[65.28%] top-[57.78%] h-[560px] w-[680px]", "inset-[-21.43%_-17.65%]"],
-  [blobMidAccent, "left-[34.72%] top-[-11.11%] h-[480px] w-[500px]", "inset-[-27.08%_-26%]"],
-] as const;
+/** Foto ruang kerja + gradien biru tua agar teks di atasnya tetap terbaca. */
+const Photo = ({ sizes }: { sizes: string }) => (
+  <>
+    <img
+      src={unsplashUrl(AUTH_PHOTO.id, 1200)}
+      srcSet={unsplashSrcSet(AUTH_PHOTO.id)}
+      sizes={sizes}
+      alt=""
+      className="absolute inset-0 size-full object-cover"
+    />
+    <span aria-hidden className="absolute inset-0 bg-linear-to-t from-band-deep via-band-deep/70 to-band-deep/30" />
+  </>
+);
 
 const AuthLayout = ({
   title,
   children,
-  sideTitle = "Selamat datang.",
-  sideDescription = "Gunakan aplikasi dengan mudah dan aman.",
+  sideTitle = "Kelola pengguna, peran, dan akses unit usaha dari satu tempat.",
+  sideDescription = "Setiap perubahan akses tercatat di audit log, sehingga tim selalu tahu siapa mengubah apa dan kapan.",
 }: AuthLayoutProps) => {
   useEffect(() => {
     document.title = title;
   }, [title]);
 
   return (
-    <main className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-linear-to-r from-neutral-bg to-brand-primary-soft px-4 py-12">
-    {blobs.map(([src, className, inset]) => (
-      <div key={src} aria-hidden className={`pointer-events-none absolute dark:opacity-10 ${className}`}>
-        <div className={`absolute ${inset}`}>
-          <img alt="" className="block size-full max-w-none" src={src} />
+    <div className="grid min-h-dvh bg-neutral-surface lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
+      {/* Desktop: panel foto di kiri dengan logo dan pesan utama. */}
+      <aside className="relative hidden overflow-hidden bg-band-deep lg:block">
+        <Photo sizes="50vw" />
+        <div className="relative flex h-full flex-col justify-between p-10 xl:p-14">
+          <Logo light />
+          <div>
+            <p className="max-w-md text-[28px] leading-[1.2] font-medium tracking-[-0.015em] text-balance text-text-on-dark">
+              {sideTitle}
+            </p>
+            <p className="mt-3 max-w-md text-sm leading-relaxed text-text-on-dark-muted">{sideDescription}</p>
+          </div>
         </div>
-      </div>
-    ))}
+      </aside>
 
-    <ThemeToggle className="absolute right-4 top-4 z-10 bg-neutral-surface text-text-muted shadow-card hover:bg-neutral-soft" />
-
-    <div className="relative flex w-full max-w-[880px] flex-col overflow-clip rounded-card border border-neutral-line bg-neutral-surface shadow-card md:flex-row">
-      <div className="flex flex-col justify-center gap-6 p-8 sm:p-12 md:w-1/2">
-        {children}
-      </div>
-
-      <div className="relative flex flex-col justify-center gap-6 overflow-clip bg-header p-8 sm:p-12 md:w-1/2">
-        <img alt="" aria-hidden className="absolute top-[-80px] left-[280px] size-[220px]" src={decoCircle1} />
-        <img alt="" aria-hidden className="absolute top-[260px] left-[320px] size-[180px]" src={decoCircle2} />
-        <div className="relative flex flex-col gap-6 text-white">
-          <p className="font-heading text-[32px] leading-10 font-extrabold">{sideTitle}</p>
-          <p className="text-base leading-6 opacity-85">{sideDescription}</p>
+      <main id="konten" className="flex flex-col px-4 py-6 sm:px-8 lg:px-12">
+        <div className="flex items-center justify-between gap-3">
+          <span className="lg:hidden">
+            <Logo />
+          </span>
+          <ThemeToggle className="ml-auto text-text-muted hover:bg-neutral-recessed hover:text-text-strong" />
         </div>
-      </div>
+
+        <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-8">
+          {/* Ponsel & tablet: foto ringkas di atas form. */}
+          <div className="relative mb-8 flex h-36 items-end overflow-hidden rounded-card bg-band-deep p-4 lg:hidden">
+            <Photo sizes="(min-width: 640px) 384px, 100vw" />
+            <p className="relative text-sm leading-snug font-medium text-text-on-dark">{sideTitle}</p>
+          </div>
+          <div className="animate-muncul motion-reduce:animate-none">{children}</div>
+        </div>
+
+        <p className="text-center text-xs text-text-subtle">
+          © {new Date().getFullYear()} Araya Business Hub
+        </p>
+      </main>
     </div>
-    </main>
   );
 };
 

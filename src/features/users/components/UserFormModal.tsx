@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
-import Modal from "../../../components/common/Modal/Modal";
+import { UserPen, UserPlus } from "lucide-react";
+import Modal, { ModalFooter } from "../../../components/common/Modal/Modal";
 import Input from "../../../components/common/Input/Input";
 import Select from "../../../components/common/Select/Select";
 import Button from "../../../components/common/Button/Button";
@@ -81,7 +82,7 @@ const UserFormModal = ({ user, roles, divisions, onClose, onSaved }: UserFormMod
   }
 
   return (
-    <Modal title={isEdit ? "Ubah pengguna" : "Tambah pengguna"} onClose={onClose}>
+    <Modal title={isEdit ? "Ubah pengguna" : "Tambah pengguna"} description={isEdit ? "Perbarui peran, divisi, atau unit usaha pengguna." : "Akun baru langsung bisa dipakai untuk masuk."} icon={isEdit ? UserPen : UserPlus} onClose={onClose}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
         {error && <Alert>{error}</Alert>}
         <Input label="Nama lengkap" id="user-name" name="name" value={form.name} onChange={(e) => set("name")(e.target.value)} placeholder="Masukkan nama lengkap" error={fields.name} />
@@ -91,17 +92,17 @@ const UserFormModal = ({ user, roles, divisions, onClose, onSaved }: UserFormMod
             <Input label="Kata sandi awal" id="user-password" name="password" type="password" autoComplete="new-password" showPasswordToggle value={form.password} onChange={(e) => set("password")(e.target.value)} placeholder="Masukkan kata sandi" error={fields.password} hint={PASSWORD_RULE_HINT} />
           </>
         )}
-        <Select label="Peran" id="user-role" value={form.role} options={toOptions(roles)} onChange={(e) => set("role")(e.target.value)} placeholder="Pilih peran" error={fields.role} />
-        <Select label="Divisi" id="user-division" value={form.division} options={toOptions(divisions)} onChange={(e) => set("division")(e.target.value)} placeholder="Tanpa divisi" error={fields.division} />
+        <Select label="Peran" id="user-role" value={form.role} options={toOptions(roles)} onChange={set("role")} placeholder="Pilih peran" error={fields.role} />
+        <Select label="Divisi" id="user-division" value={form.division} options={toOptions(divisions)} onChange={set("division")} placeholder="Tanpa divisi" error={fields.division} />
         <Input label="ID unit usaha (opsional)" id="user-unit" name="unit_usaha_id" type="number" value={form.unit_usaha_id} onChange={(e) => set("unit_usaha_id")(e.target.value)} placeholder="Kosongkan bila tidak terikat unit usaha" error={fields.unit_usaha_id} />
-        <div className="mt-2 flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="h-10 rounded-field border border-neutral-line px-4 text-sm font-semibold text-text-muted hover:bg-neutral-bg">
+        <ModalFooter>
+          <Button type="button" variant="secondary" onClick={onClose}>
             Batal
-          </button>
-          <Button type="submit" disabled={loading} className="w-auto! px-5 disabled:cursor-wait disabled:opacity-70">
+          </Button>
+          <Button type="submit" loading={loading} className="sm:w-auto">
             {loading ? "Menyimpan..." : "Simpan"}
           </Button>
-        </div>
+        </ModalFooter>
       </form>
     </Modal>
   );

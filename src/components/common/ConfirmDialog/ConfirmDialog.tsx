@@ -1,5 +1,7 @@
 import { useState, type ReactNode } from "react";
-import Modal from "../Modal/Modal";
+import { CircleCheck, TriangleAlert } from "lucide-react";
+import Modal, { ModalFooter } from "../Modal/Modal";
+import Button from "../Button/Button";
 import Alert from "../Alert/Alert";
 import { ApiError } from "../../../services/api";
 
@@ -10,13 +12,9 @@ interface ConfirmDialogProps {
   onConfirm: () => Promise<unknown>;
   onClose: () => void;
   onDone: () => void;
-  tone?: keyof typeof confirmTones;
+  tone?: "danger" | "primary";
 }
 
-const confirmTones = {
-  danger: "bg-red-600 text-white hover:bg-red-700",
-  primary: "bg-brand-primary text-brand-on-primary hover:bg-brand-primary-strong",
-};
 
 // Dialog konfirmasi untuk aksi berisiko (mis. menonaktifkan data). Pesan
 // galat dari backend (error.message) ditampilkan di dalam dialog.
@@ -38,19 +36,25 @@ const ConfirmDialog = ({ title, children, confirmLabel, onConfirm, onClose, onDo
   }
 
   return (
-    <Modal title={title} onClose={onClose}>
+    <Modal
+      title={title}
+      icon={tone === "danger" ? TriangleAlert : CircleCheck}
+      tone={tone === "danger" ? "danger" : "default"}
+      size="sm"
+      onClose={onClose}
+    >
       <div className="flex flex-col gap-4">
         {error && <Alert>{error}</Alert>}
         <div className="text-sm leading-6 text-text-muted">{children}</div>
-        <div className="flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="h-10 rounded-field border border-neutral-line px-4 text-sm font-semibold text-text-muted hover:bg-neutral-bg">
-            Batal
-          </button>
-          <button type="button" onClick={handleConfirm} disabled={loading} className={`h-10 rounded-field px-4 text-sm font-semibold disabled:cursor-wait disabled:opacity-70 ${confirmTones[tone]}`}>
-            {loading ? "Memproses..." : confirmLabel}
-          </button>
-        </div>
       </div>
+      <ModalFooter>
+        <Button type="button" variant="secondary" onClick={onClose}>
+          Batal
+        </Button>
+        <Button type="button" variant={tone === "danger" ? "danger" : "primary"} loading={loading} onClick={handleConfirm} className="sm:w-auto">
+          {loading ? "Memproses..." : confirmLabel}
+        </Button>
+      </ModalFooter>
     </Modal>
   );
 };

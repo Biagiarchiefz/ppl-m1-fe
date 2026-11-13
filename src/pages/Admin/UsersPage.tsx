@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import AdminLayout from "./AdminLayout";
 import Alert from "../../components/common/Alert/Alert";
 import Pagination from "../../components/common/Pagination/Pagination";
+import Select from "../../components/common/Select/Select";
 import UserFormModal from "../../features/users/components/UserFormModal";
 import DeactivateDialog from "../../features/users/components/DeactivateDialog";
 import ConfirmDialog from "../../components/common/ConfirmDialog/ConfirmDialog";
@@ -19,8 +20,11 @@ const STATUS_FILTER: Record<string, boolean | undefined> = {
   nonaktif: false,
 };
 
-const selectClass =
-  "h-10 rounded-field border border-neutral-line-strong bg-neutral-surface px-3 text-sm text-text-default outline-none focus:border-brand-primary";
+const STATUS_OPTIONS = [
+  { value: "semua", label: "Semua status" },
+  { value: "aktif", label: "Aktif" },
+  { value: "nonaktif", label: "Nonaktif" },
+];
 
 type Dialog =
   | { kind: "create" }
@@ -63,14 +67,14 @@ const UsersPage = () => {
 
   return (
     <AdminLayout>
-      <div className="p-7">
+      <div>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="font-body text-[32px] font-semibold leading-10 text-text-default">Pengguna</h1>
+            <h1 className="text-2xl leading-tight font-medium text-text-strong">Pengguna</h1>
             <p className="mt-1 text-sm leading-[22px] text-text-muted">Kelola data pengguna dan akses mereka.</p>
           </div>
           {canManage && (
-            <button type="button" onClick={() => setDialog({ kind: "create" })} className="flex h-10 items-center gap-2 rounded-field bg-brand-primary px-4 text-sm font-semibold text-brand-on-primary hover:bg-brand-primary-strong">
+            <button type="button" onClick={() => setDialog({ kind: "create" })} className="flex min-h-10 items-center gap-2 rounded-full efek-tekan bg-brand-primary px-4 text-sm font-semibold text-brand-on-primary hover:bg-brand-primary-strong">
               <UserPlus size={18} strokeWidth={1.8} />
               Tambah pengguna
             </button>
@@ -93,27 +97,35 @@ const UsersPage = () => {
                 }}
                 placeholder="Cari nama atau email"
                 aria-label="Cari pengguna"
-                className="h-10 w-full rounded-field border border-neutral-line-strong bg-neutral-surface pl-10 pr-3 text-sm text-text-default outline-none placeholder:text-text-muted focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20"
+                className="h-10 w-full rounded-field border border-neutral-line bg-neutral-surface hover:border-neutral-line-strong pl-10 pr-3 text-sm text-text-default outline-none placeholder:text-text-muted focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/30"
               />
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <SlidersHorizontal size={18} className="text-text-muted" aria-hidden />
-              <select value={role} onChange={(e) => { setRole(e.target.value); setPage(1); }} aria-label="Filter peran" className={selectClass}>
-                <option value="">Semua peran</option>
-                {roles.map((r) => <option key={r.code} value={r.code}>{r.name}</option>)}
-              </select>
-              <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} aria-label="Filter status" className={selectClass}>
-                <option value="semua">Semua status</option>
-                <option value="aktif">Aktif</option>
-                <option value="nonaktif">Nonaktif</option>
-              </select>
+              <SlidersHorizontal size={18} className="text-text-muted lg:hidden" aria-hidden />
+              <Select
+                label="Filter peran"
+                hideLabel
+                className="w-44"
+                value={role}
+                placeholder="Semua peran"
+                options={roles.map((r) => ({ value: r.code, label: r.name }))}
+                onChange={(v) => { setRole(v); setPage(1); }}
+              />
+              <Select
+                label="Filter status"
+                hideLabel
+                className="w-40"
+                value={status}
+                options={STATUS_OPTIONS}
+                onChange={(v) => { setStatus(v); setPage(1); }}
+              />
             </div>
           </div>
 
           <div className="overflow-x-auto">
             <table className={`w-full min-w-[760px] border-collapse text-left ${loading ? "opacity-60" : ""}`}>
               <thead className="bg-neutral-bg">
-                <tr className="border-b border-neutral-line text-xs font-semibold uppercase tracking-wide text-neutral-line-strong">
+                <tr className="border-b border-neutral-line bg-neutral-soft text-xs font-semibold uppercase tracking-[0.04em] text-text-muted">
                   <th className="px-4 py-3">Nama pengguna</th>
                   <th className="px-4 py-3">Peran</th>
                   <th className="px-4 py-3">Divisi</th>

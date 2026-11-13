@@ -9,6 +9,7 @@ import { activateOrganization, deactivateOrganization, deleteOrganization, listO
 import { useAsync } from "../../hooks/useAsync";
 import { useDebounce } from "../../hooks/useDebounce";
 import { formatDate } from "../../utils/formatDate";
+import Select from "../../components/common/Select/Select";
 
 type Dialog =
   | { kind: "create" }
@@ -45,13 +46,13 @@ const OrganizationsPage = () => {
 
   return (
     <AdminLayout>
-      <div className="p-7">
+      <div>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="font-body text-[32px] font-semibold leading-10 text-text-default">Organisasi</h1>
+            <h1 className="text-2xl leading-tight font-medium text-text-strong">Organisasi</h1>
             <p className="mt-1 text-sm leading-[22px] text-text-muted">Organisasi yang memakai platform. Tiap organisasi mengatur pengguna, peran, dan divisinya sendiri.</p>
           </div>
-          <button type="button" onClick={() => setDialog({ kind: "create" })} className="flex h-10 items-center gap-2 rounded-field bg-brand-primary px-4 text-sm font-semibold text-brand-on-primary hover:bg-brand-primary-strong">
+          <button type="button" onClick={() => setDialog({ kind: "create" })} className="flex min-h-10 items-center gap-2 rounded-full efek-tekan bg-brand-primary px-4 text-sm font-semibold text-brand-on-primary hover:bg-brand-primary-strong">
             <Plus size={18} strokeWidth={1.8} />
             Daftarkan organisasi
           </button>
@@ -64,18 +65,25 @@ const OrganizationsPage = () => {
           <div className="flex flex-wrap items-center gap-3 border-b border-neutral-line p-4">
             <div className="relative min-w-[240px] flex-1">
               <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" aria-hidden />
-              <input type="search" value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} placeholder="Cari nama atau kode" aria-label="Cari organisasi" className="h-10 w-full rounded-field border border-neutral-line-strong bg-neutral-surface pl-10 pr-3 text-sm outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20" />
+              <input type="search" value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} placeholder="Cari nama atau kode" aria-label="Cari organisasi" className="h-10 w-full rounded-field border border-neutral-line bg-neutral-surface hover:border-neutral-line-strong pl-10 pr-3 text-sm outline-none focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/30" />
             </div>
-            <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} aria-label="Filter status" className="h-10 rounded-field border border-neutral-line-strong bg-neutral-surface px-3 text-sm outline-none focus:border-brand-primary">
-              <option value="semua">Semua status</option>
-              <option value="aktif">Aktif</option>
-              <option value="nonaktif">Nonaktif</option>
-            </select>
+            <Select
+              label="Filter status"
+              hideLabel
+              className="w-40"
+              value={status}
+              options={[
+                { value: "semua", label: "Semua status" },
+                { value: "aktif", label: "Aktif" },
+                { value: "nonaktif", label: "Nonaktif" },
+              ]}
+              onChange={(v) => { setStatus(v); setPage(1); }}
+            />
           </div>
           <div className="overflow-x-auto">
             <table className={`w-full min-w-[640px] border-collapse text-left ${loading ? "opacity-60" : ""}`}>
               <thead className="bg-neutral-bg">
-                <tr className="border-b border-neutral-line text-xs font-semibold uppercase tracking-wide text-neutral-line-strong">
+                <tr className="border-b border-neutral-line bg-neutral-soft text-xs font-semibold uppercase tracking-[0.04em] text-text-muted">
                   <th className="px-4 py-3">Organisasi</th>
                   <th className="px-4 py-3">Terdaftar</th>
                   <th className="px-4 py-3">Status</th>
@@ -114,7 +122,7 @@ const OrganizationsPage = () => {
                 {!loading && orgs.length === 0 && (
                   <tr>
                     <td colSpan={4} className="px-4 py-12 text-center">
-                      <Building2 size={28} className="mx-auto text-neutral-line-strong" aria-hidden />
+                      <Building2 size={28} className="mx-auto text-text-subtle" aria-hidden />
                       <p className="mt-2 text-sm text-text-muted">{q || status !== "semua" ? "Tidak ada organisasi yang cocok." : "Belum ada organisasi terdaftar."}</p>
                     </td>
                   </tr>

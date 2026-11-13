@@ -41,19 +41,18 @@ const Input = (props: PropTypes) => {
   const PasswordToggleIcon = isPasswordVisible ? EyeOff : Eye;
 
   return (
-    <div className="flex flex-col gap-2">
-      <label
-        htmlFor={id}
-        className="text-sm leading-5 font-semibold text-text-default"
-      >
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={id} className="text-sm leading-5 font-medium text-text-default">
         {label}
       </label>
-      <div className={`flex h-10 items-center gap-3 rounded-field border bg-neutral-surface px-3 focus-within:ring-2 ${error ? "border-danger focus-within:ring-danger/20" : "border-neutral-line-strong focus-within:border-brand-primary focus-within:ring-brand-primary/20"}`}>
-        {Icon && (
-          <span className="flex size-5 shrink-0 items-center justify-center">
-            <Icon size={20} strokeWidth={1.6} aria-hidden />
-          </span>
-        )}
+      <div
+        className={`flex min-h-11 items-center gap-2.5 rounded-field border bg-neutral-surface px-3.5 transition-colors duration-150 focus-within:ring-2 ${
+          error
+            ? "border-danger focus-within:ring-danger/20"
+            : "border-neutral-line hover:border-neutral-line-strong focus-within:border-brand-accent focus-within:ring-brand-accent/30"
+        }`}
+      >
+        {Icon && <Icon size={16} strokeWidth={1.5} aria-hidden className="shrink-0 text-text-subtle" />}
         <input
           id={id}
           name={name}
@@ -65,24 +64,23 @@ const Input = (props: PropTypes) => {
           placeholder={placeholder}
           aria-invalid={Boolean(error)}
           aria-describedby={error || hint ? messageId : undefined}
-          className="min-w-0 flex-1 bg-transparent text-sm leading-[22px] text-text-default outline-none placeholder:text-text-muted"
+          className="min-w-0 flex-1 bg-transparent py-2.5 text-base text-text-default outline-none placeholder:text-text-subtle sm:text-sm"
         />
         {isPassword && showPasswordToggle && (
           <Button
             variant="ghost"
             type="button"
-            aria-label={
-              isPasswordVisible ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"
-            }
+            className="-mr-2"
+            aria-label={isPasswordVisible ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
             aria-pressed={isPasswordVisible}
             onClick={() => setIsPasswordVisible((visible) => !visible)}
           >
-            <PasswordToggleIcon size={20} strokeWidth={1.6} aria-hidden />
+            <PasswordToggleIcon size={16} strokeWidth={1.5} aria-hidden />
           </Button>
         )}
       </div>
       {(error || hint) && (
-        <p id={messageId} className={`text-xs leading-5 ${error ? "text-danger" : "text-text-muted"}`}>
+        <p id={messageId} className={`text-sm leading-5 ${error ? "text-danger" : "text-text-subtle"}`}>
           {error ?? hint}
         </p>
       )}

@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
-import { LockKeyhole } from "lucide-react";
-import Modal from "../../../components/common/Modal/Modal";
+import { KeyRound, LockKeyhole } from "lucide-react";
+import Modal, { ModalFooter } from "../../../components/common/Modal/Modal";
 import Input from "../../../components/common/Input/Input";
 import Button from "../../../components/common/Button/Button";
 import Alert from "../../../components/common/Alert/Alert";
@@ -56,20 +56,20 @@ const ChangePasswordModal = ({ onClose, onSaved }: ChangePasswordModalProps) => 
   }
 
   return (
-    <Modal title="Ubah kata sandi" onClose={onClose}>
+    <Modal title="Ubah kata sandi" description="Gunakan kata sandi yang kuat dan belum pernah dipakai di layanan lain." icon={KeyRound} size="sm" onClose={onClose}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
         {error && <Alert>{error}</Alert>}
         <Input label="Kata sandi lama" icon={LockKeyhole} id="old_password" name="old_password" type="password" autoComplete="current-password" showPasswordToggle value={form.old_password} onChange={(e) => set("old_password")(e.target.value)} placeholder="Masukkan kata sandi lama" error={fields.old_password} />
         <Input label="Kata sandi baru" icon={LockKeyhole} id="new_password" name="new_password" type="password" autoComplete="new-password" showPasswordToggle value={form.new_password} onChange={(e) => set("new_password")(e.target.value)} placeholder="Masukkan kata sandi baru" error={fields.new_password} hint={PASSWORD_RULE_HINT} />
         <Input label="Konfirmasi kata sandi baru" icon={LockKeyhole} id="confirmation" name="confirmation" type="password" autoComplete="new-password" showPasswordToggle value={form.confirmation} onChange={(e) => set("confirmation")(e.target.value)} placeholder="Ulangi kata sandi baru" error={fields.confirmation} />
-        <div className="mt-2 flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="h-10 rounded-field border border-neutral-line px-4 text-sm font-semibold text-text-muted hover:bg-neutral-bg">
+        <ModalFooter>
+          <Button type="button" variant="secondary" onClick={onClose}>
             Batal
-          </button>
-          <Button type="submit" disabled={loading} className="w-auto! px-5 disabled:cursor-wait disabled:opacity-70">
+          </Button>
+          <Button type="submit" loading={loading} className="sm:w-auto">
             {loading ? "Menyimpan..." : "Simpan kata sandi"}
           </Button>
-        </div>
+        </ModalFooter>
       </form>
     </Modal>
   );

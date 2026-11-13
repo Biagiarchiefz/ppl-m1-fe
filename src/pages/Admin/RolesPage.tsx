@@ -35,13 +35,13 @@ const RolesPage = () => {
 
   return (
     <AdminLayout>
-      <div className="p-7">
+      <div>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="font-body text-[32px] font-semibold leading-10 text-text-default">Peran &amp; Izin</h1>
+            <h1 className="text-2xl leading-tight font-medium text-text-strong">Peran &amp; Izin</h1>
             <p className="mt-1 text-sm leading-[22px] text-text-muted">Atur peran sesuai struktur organisasi dan pilih izin untuk tiap peran.</p>
           </div>
-          <button type="button" onClick={() => setDialog({ kind: "create" })} className="flex h-10 items-center gap-2 rounded-field bg-brand-primary px-4 text-sm font-semibold text-brand-on-primary hover:bg-brand-primary-strong">
+          <button type="button" onClick={() => setDialog({ kind: "create" })} className="flex min-h-10 items-center gap-2 rounded-full efek-tekan bg-brand-primary px-4 text-sm font-semibold text-brand-on-primary hover:bg-brand-primary-strong">
             <Plus size={18} strokeWidth={1.8} />
             Tambah peran
           </button>
@@ -54,7 +54,7 @@ const RolesPage = () => {
           <div className="overflow-x-auto">
             <table className={`w-full min-w-[760px] border-collapse text-left ${loading ? "opacity-60" : ""}`}>
               <thead className="bg-neutral-bg">
-                <tr className="border-b border-neutral-line text-xs font-semibold uppercase tracking-wide text-neutral-line-strong">
+                <tr className="border-b border-neutral-line bg-neutral-soft text-xs font-semibold uppercase tracking-[0.04em] text-text-muted">
                   <th className="px-4 py-3">Peran</th>
                   <th className="px-4 py-3">Izin</th>
                   <th className="px-4 py-3">Status</th>

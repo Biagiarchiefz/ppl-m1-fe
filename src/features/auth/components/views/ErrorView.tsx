@@ -14,7 +14,7 @@ const ErrorView = ({ code, title, description, icon: Icon }: ErrorViewProps) => 
   const navigate = useNavigate();
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-linear-to-br from-neutral-bg to-brand-primary-soft px-4">
+    <main className="flex min-h-screen items-center justify-center bg-neutral-bg px-4">
       <section className="relative w-full max-w-[288px] overflow-hidden rounded-card border border-neutral-line bg-neutral-surface px-6 py-7 text-center shadow-card sm:max-w-[360px] sm:px-8">
         <div
           aria-hidden
@@ -29,10 +29,10 @@ const ErrorView = ({ code, title, description, icon: Icon }: ErrorViewProps) => 
           <div className="flex size-14 items-center justify-center rounded-full bg-brand-primary-soft text-brand-primary">
             <Icon size={28} strokeWidth={1.8} aria-hidden />
           </div>
-          <h1 className="mt-4 font-heading text-[32px] leading-10 font-bold text-brand-primary">
+          <h1 className="mt-4 text-[40px] leading-none font-semibold tracking-[-0.02em] text-brand-primary tabular-nums">
             {code}
           </h1>
-          <h2 className="mt-1 font-heading text-lg font-bold text-text-default">
+          <h2 className="mt-2 text-lg font-medium text-text-strong">
             {title}
           </h2>
           <p className="mt-2 text-xs leading-5 text-text-muted">{description}</p>
@@ -40,7 +40,7 @@ const ErrorView = ({ code, title, description, icon: Icon }: ErrorViewProps) => 
           <Button
             type="button"
             onClick={() => navigate(homePath(), { replace: true })}
-            className="flex h-9 items-center justify-center gap-2 p-2 text-xs"
+            size="sm"
           >
             <ArrowLeft size={14} strokeWidth={2} aria-hidden />
             Kembali

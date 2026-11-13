@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from "react";
-import { Check, LockKeyhole, Mail } from "lucide-react";
+import { ArrowRight, Check, LockKeyhole, Mail } from "lucide-react";
 import { useNavigate } from "react-router";
-import divider from "../../../../assets/login/divider.svg";
 import Input from "../../../../components/common/Input/Input";
 import Button from "../../../../components/common/Button/Button";
 import Alert from "../../../../components/common/Alert/Alert";
@@ -39,16 +38,15 @@ const Login = () => {
 
   return (
     <>
-      <div className="flex flex-col gap-2">
-        <h1 className="font-heading text-[28px] leading-9 font-bold text-text-default">
-          Masuk ke akun Anda
-        </h1>
-        <p className="text-base leading-6 text-text-muted">
-          Gunakan akun yang telah terdaftar untuk melanjutkan.
+      <header>
+        <p className="text-xs font-semibold tracking-[0.06em] text-brand-primary uppercase">Panel M1</p>
+        <h1 className="mt-2 text-2xl leading-tight font-medium text-text-strong">Selamat datang kembali</h1>
+        <p className="mt-1.5 text-sm leading-relaxed text-text-muted">
+          Masuk dengan akun yang telah didaftarkan administrator.
         </p>
-      </div>
-      <img alt="" aria-hidden className="block h-px w-full dark:opacity-20" src={divider} />
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+      </header>
+
+      <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4" noValidate>
         {error && <Alert>{error}</Alert>}
         <Input
           label="Email"
@@ -59,7 +57,7 @@ const Login = () => {
           autoComplete="username"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="Masukkan email"
+          placeholder="nama@perusahaan.com"
           error={fields.email}
         />
         <Input
@@ -75,27 +73,34 @@ const Login = () => {
           placeholder="Masukkan kata sandi"
           error={fields.password}
         />
-        <label className="flex cursor-pointer items-center gap-3">
+        <label className="flex min-h-9 cursor-pointer items-center gap-2.5 self-start">
           <input
             type="checkbox"
             checked={remember}
             onChange={(e) => setRemember(e.target.checked)}
             className="peer sr-only"
           />
-          <span className="flex size-4 items-center justify-center rounded-[4px] border border-neutral-line-strong bg-neutral-surface text-brand-on-primary peer-checked:border-brand-primary peer-checked:bg-brand-primary peer-focus-visible:ring-2 peer-focus-visible:ring-brand-primary/40 [&>svg]:invisible peer-checked:[&>svg]:visible">
-            <Check size={16} strokeWidth={1.6} aria-hidden />
+          <span className="flex size-[18px] items-center justify-center rounded-[5px] border border-neutral-line-strong bg-neutral-surface text-brand-on-primary transition-colors duration-150 peer-checked:border-brand-primary peer-checked:bg-brand-primary peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-accent [&>svg]:invisible peer-checked:[&>svg]:visible">
+            <Check size={14} strokeWidth={2} aria-hidden />
           </span>
-          <span className="font-inter text-base leading-[1.4] text-text-default">
-            Ingat saya
-          </span>
+          <span className="text-sm text-text-default">Ingat saya</span>
         </label>
-        <Button type="submit" disabled={loading} className="disabled:cursor-wait disabled:opacity-70">
+        <Button type="submit" loading={loading} className="mt-1">
           {loading ? "Memproses..." : "Masuk"}
+          {!loading && (
+            <ArrowRight
+              size={16}
+              strokeWidth={1.5}
+              aria-hidden
+              className="transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transition-none"
+            />
+          )}
         </Button>
-        <p className="text-center text-sm text-text-muted">
-          Belum punya akun? Hubungi administrator.
-        </p>
       </form>
+
+      <div className="mt-8 rounded-field bg-neutral-soft px-3.5 py-3 text-sm leading-relaxed text-text-muted">
+        Belum punya akun atau lupa kata sandi? Hubungi administrator organisasi Anda.
+      </div>
     </>
   );
 };

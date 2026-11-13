@@ -2,7 +2,7 @@ import AuthLayout from "../../layouts/AuthLayout";
 import Login from "../../features/auth/components/views/Login";
 
 const SignInPage = () => (
-  <AuthLayout title="Acara | Login">
+  <AuthLayout title="Masuk — Araya Business Hub">
     <Login />
   </AuthLayout>
 );

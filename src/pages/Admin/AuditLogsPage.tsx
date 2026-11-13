@@ -7,9 +7,10 @@ import { AUDIT_ACTIONS, listAuditLogs, listPlatformAuditLogs, type AuditLog } fr
 import { useAsync } from "../../hooks/useAsync";
 import { useDebounce } from "../../hooks/useDebounce";
 import { formatDateTime } from "../../utils/formatDate";
+import Select from "../../components/common/Select/Select";
 
 const fieldClass =
-  "h-10 rounded-field border border-neutral-line-strong bg-neutral-surface px-3 text-sm text-text-default outline-none focus:border-brand-primary";
+  "min-h-10 rounded-field border border-neutral-line bg-neutral-surface px-3 text-sm text-text-default outline-none transition-colors duration-150 hover:border-neutral-line-strong focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/30";
 
 function describeChange(log: AuditLog): string {
   const fmt = (v: Record<string, unknown> | null) =>
@@ -77,8 +78,8 @@ const AuditLogsPage = ({ scope = "organization" }: AuditLogsPageProps) => {
 
   return (
     <AdminLayout>
-      <div className="p-7">
-        <h1 className="font-body text-[32px] font-semibold leading-10 text-text-default">
+      <div>
+        <h1 className="text-2xl leading-tight font-medium text-text-strong">
           {platform ? "Audit log platform" : "Audit log"}
         </h1>
         <p className="mt-1 text-sm leading-[22px] text-text-muted">
@@ -99,13 +100,15 @@ const AuditLogsPage = ({ scope = "organization" }: AuditLogsPageProps) => {
               Sampai tanggal
               <input type="date" value={to} min={from || undefined} onChange={(e) => onFilter(setTo)(e.target.value)} className={fieldClass} />
             </label>
-            <label className="flex flex-col gap-1 text-xs font-semibold text-text-muted">
-              Aksi
-              <select value={action} onChange={(e) => onFilter(setAction)(e.target.value)} className={fieldClass}>
-                <option value="">Semua aksi</option>
-                {Object.entries(AUDIT_ACTIONS).map(([code, label]) => <option key={code} value={code}>{label}</option>)}
-              </select>
-            </label>
+            <Select
+              label="Aksi"
+              labelClassName="text-xs font-semibold text-text-muted"
+              className="w-56 gap-1!"
+              value={action}
+              placeholder="Semua aksi"
+              options={Object.entries(AUDIT_ACTIONS).map(([code, label]) => ({ value: code, label }))}
+              onChange={onFilter(setAction)}
+            />
             {platform && (
               <label className="flex flex-col gap-1 text-xs font-semibold text-text-muted">
                 ID organisasi
@@ -121,7 +124,7 @@ const AuditLogsPage = ({ scope = "organization" }: AuditLogsPageProps) => {
           <div className="overflow-x-auto">
             <table className={`w-full min-w-[920px] border-collapse text-left ${loading ? "opacity-60" : ""}`}>
               <thead className="bg-neutral-bg">
-                <tr className="border-b border-neutral-line text-xs font-semibold uppercase tracking-wide text-neutral-line-strong">
+                <tr className="border-b border-neutral-line bg-neutral-soft text-xs font-semibold uppercase tracking-[0.04em] text-text-muted">
                   <th className="px-4 py-3">Waktu</th>
                   {platform && <th className="px-4 py-3">Organisasi</th>}
                   <th className="px-4 py-3">Pelaku</th>
@@ -146,7 +149,7 @@ const AuditLogsPage = ({ scope = "organization" }: AuditLogsPageProps) => {
                 {!loading && logs.length === 0 && (
                   <tr>
                     <td colSpan={columns} className="px-4 py-12 text-center">
-                      <History size={28} className="mx-auto text-neutral-line-strong" aria-hidden />
+                      <History size={28} className="mx-auto text-text-subtle" aria-hidden />
                       <p className="mt-2 text-sm text-text-muted">
                         {hasFilter ? "Tidak ada catatan yang cocok dengan filter." : "Belum ada catatan audit log."}
                       </p>

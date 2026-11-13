@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
-import Modal from "../../../components/common/Modal/Modal";
+import { Building2 } from "lucide-react";
+import Modal, { ModalFooter } from "../../../components/common/Modal/Modal";
 import Input from "../../../components/common/Input/Input";
 import Button from "../../../components/common/Button/Button";
 import Alert from "../../../components/common/Alert/Alert";
@@ -54,7 +55,7 @@ const OrganizationFormModal = ({ organization, onClose, onSaved }: OrganizationF
   }
 
   return (
-    <Modal title={isEdit ? "Ubah organisasi" : "Daftarkan organisasi"} onClose={onClose}>
+    <Modal title={isEdit ? "Ubah organisasi" : "Daftarkan organisasi"} description={isEdit ? "Perbarui nama organisasi." : "Organisasi baru beserta akun admin pertamanya."} icon={Building2} onClose={onClose}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
         {error && <Alert>{error}</Alert>}
         {!isEdit && (
@@ -69,14 +70,14 @@ const OrganizationFormModal = ({ organization, onClose, onSaved }: OrganizationF
             <Input label="Kata sandi awal" id="org-admin-password" name="admin-password" type="password" autoComplete="new-password" showPasswordToggle value={form.adminPassword} onChange={(e) => set("adminPassword")(e.target.value)} placeholder="Kata sandi" error={fields["admin.password"]} hint={PASSWORD_RULE_HINT} />
           </fieldset>
         )}
-        <div className="mt-2 flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="h-10 rounded-field border border-neutral-line px-4 text-sm font-semibold text-text-muted hover:bg-neutral-bg">
+        <ModalFooter>
+          <Button type="button" variant="secondary" onClick={onClose}>
             Batal
-          </button>
-          <Button type="submit" disabled={loading} className="w-auto! px-5 disabled:cursor-wait disabled:opacity-70">
+          </Button>
+          <Button type="submit" loading={loading} className="sm:w-auto">
             {loading ? "Menyimpan..." : "Simpan"}
           </Button>
-        </div>
+        </ModalFooter>
       </form>
     </Modal>
   );

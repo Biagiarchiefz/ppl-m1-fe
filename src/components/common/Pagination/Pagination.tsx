@@ -8,7 +8,7 @@ interface PaginationProps {
 }
 
 const buttonClass =
-  "rounded border border-neutral-line px-3 py-1.5 text-xs hover:bg-neutral-bg disabled:cursor-not-allowed disabled:opacity-50";
+  "min-h-9 rounded-full border border-neutral-line bg-neutral-surface hover:border-neutral-line-strong px-3.5 text-xs font-medium text-text-default efek-tekan hover:bg-neutral-soft disabled:cursor-not-allowed disabled:opacity-50";
 
 const Pagination = ({ meta, itemCount, noun, onPageChange }: PaginationProps) => {
   const page = meta?.page ?? 1;
@@ -23,7 +23,7 @@ const Pagination = ({ meta, itemCount, noun, onPageChange }: PaginationProps) =>
         <button type="button" disabled={page <= 1} onClick={() => onPageChange(page - 1)} className={buttonClass}>
           Sebelumnya
         </button>
-        <span className="rounded border border-brand-primary bg-brand-primary px-3 py-1.5 text-xs text-brand-on-primary">
+        <span className="rounded-full bg-brand-primary-soft px-3 py-1.5 text-xs font-medium text-link tabular-nums">
           {page} / {Math.max(totalPages, 1)}
         </span>
         <button type="button" disabled={page >= totalPages} onClick={() => onPageChange(page + 1)} className={buttonClass}>

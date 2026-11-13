@@ -3,66 +3,215 @@
 /* Varian dark: mengikuti atribut data-theme, bukan langsung setelan sistem. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-/* Token desain dari Figma "M1-K3" (UI Bersama) */
+/*
+ * Token desain. Gaya visual mengikuti Jejak Anggaran: kanvas putih lembut, satu warna
+ * aksen biru cerah, garis tipis (hairline), bayangan sangat halus, tombol berbentuk pil,
+ * dan pita biru tua yang dipakai hemat. Nama token tetap memakai konvensi proyek ini.
+ */
 @theme {
-  --font-heading: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
-  --font-inter: "Inter", ui-sans-serif, system-ui, sans-serif;
+  /* Satu font saja: Inter. Ketiga alias dipertahankan agar kelas lama tetap berlaku. */
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-heading: var(--font-sans);
+  --font-body: var(--font-sans);
+  --font-inter: var(--font-sans);
 
-  --color-neutral-bg: #f6f8fb;
-  --color-neutral-surface: #ffffff;
-  --color-neutral-line: #d3dae6;
-  --color-neutral-line-strong: #7b89a2;
-  --color-text-default: #0f172a;
-  --color-text-muted: #4b5870;
+  /* Bobot maksimal 600: font-bold / font-extrabold ikut dibatasi. */
+  --font-weight-bold: 600;
+  --font-weight-extrabold: 600;
+
+  /* Netral */
+  --color-neutral-bg: #f6f8fb; /* latar halaman (canvas) */
+  --color-neutral-surface: #fbfcfe; /* kartu, header, input */
+  --color-neutral-soft: #eef2f7; /* header tabel, hover */
+  --color-neutral-recessed: #e9eef4; /* skeleton, input nonaktif */
+  --color-neutral-line-soft: #edf1f6;
+  --color-neutral-line: #e2e8f0;
+  --color-neutral-line-strong: #cbd5e1;
+
+  /* Teks: abu gelap, bukan hitam pekat */
+  --color-text-strong: #111827;
+  --color-text-default: #1f2937;
+  --color-text-muted: #374151;
+  --color-text-subtle: #4b5563;
+  --color-text-on-dark: #ffffff;
+  --color-text-on-dark-muted: #c7e2ff;
+
+  /* Merek: biru tua #1F3F7A (warna primary proyek). brand-accent = cincin fokus & aksen kecil. */
   --color-brand-primary: #1f3f7a;
+  --color-brand-primary-strong: #172f5e;
   --color-brand-primary-soft: #e4ebf8;
   --color-brand-on-primary: #ffffff;
+  --color-brand-accent: #3b6bc4;
+  --color-brand-light: #a8c3f5;
+  --color-brand-tint: #edf2fa;
+  --color-link: #1f3f7a;
 
-  /* Tambahan untuk tema gelap. Nilai terang sama dengan warna sebelumnya. */
-  --color-neutral-soft: #f1f5f9;
-  --color-brand-primary-strong: #172f5e;
+  /* Pita biru tua (bagian gelap yang dipakai hemat) */
+  --color-band: #1f3f7a;
+  --color-band-deep: #142a52;
   --color-header: #1f3f7a;
   --color-header-strong: #172f5e;
-  --color-success: #166534;
-  --color-success-soft: #dcfce7;
-  --color-danger: #dc2626;
-  --color-danger-soft: #fef2f2;
-  --color-danger-line: #fecaca;
 
-  --radius-card: 10px;
-  --radius-field: 6px;
+  /* Status: merah hanya untuk galat dan aksi berbahaya */
+  --color-success: #047857;
+  --color-success-soft: #e7f6ef;
+  --color-warning: #a15c07;
+  --color-warning-soft: #fef3d9;
+  --color-danger: #c81e1e;
+  --color-danger-soft: #fdecec;
+  --color-danger-line: #f6c9c9;
 
-  --shadow-card: 0px 2px 8px 0px rgba(15, 23, 42, 0.04),
-    0px 6px 20px 0px rgba(15, 23, 42, 0.12);
+  /* Radius: tombol & badge rounded-full, kartu 12px, input 8px. */
+  --radius-card: 12px;
+  --radius-field: 8px;
+
+  /* Bayangan selalu tipis. */
+  --shadow-edge: 0 1px 2px rgb(31 63 122 / 0.06);
+  --shadow-card: 0 1px 2px rgb(31 63 122 / 0.05), 0 8px 24px -8px rgb(31 63 122 / 0.1);
+  --shadow-pop: 0 12px 32px -8px rgb(31 63 122 / 0.16);
+
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out-soft: cubic-bezier(0, 0, 0.2, 1);
+
+  /* Pindah halaman: konten memudar masuk (hanya opacity). */
+  --animate-halaman-masuk: halaman-masuk 240ms var(--ease-out-soft) backwards;
+  /* Elemen yang muncul: memudar sambil naik 6px. */
+  --animate-muncul: muncul 320ms var(--ease-out-soft) backwards;
+
+  @keyframes halaman-masuk {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* Balon tooltip: membesar dengan sedikit pantulan, seperti balon komik yang "pop". */
+  --animate-gelembung: gelembung 220ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+
+  @keyframes gelembung {
+    from {
+      opacity: 0;
+      scale: 0.8;
+      translate: -4px 0;
+    }
+  }
+
+  /* Modal: desktop memudar + sedikit membesar; ponsel naik dari bawah (bottom sheet). */
+  --animate-modal-masuk: modal-masuk 260ms var(--ease-out-soft) backwards;
+  --animate-sheet-naik: sheet-naik 320ms var(--ease-out-soft) backwards;
+
+  @keyframes modal-masuk {
+    from {
+      opacity: 0;
+      scale: 0.96;
+      translate: 0 8px;
+    }
+  }
+
+  @keyframes sheet-naik {
+    from {
+      translate: 0 100%;
+    }
+  }
+
+  @keyframes muncul {
+    from {
+      opacity: 0;
+      translate: 0 6px;
+    }
+  }
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --color-neutral-bg: #12161f;
-  --color-neutral-surface: #1a202c;
-  --color-neutral-soft: #2a3242;
-  --color-neutral-line: #2d3648;
-  --color-neutral-line-strong: #7b89a2;
-  --color-text-default: #e6eaf2;
-  --color-text-muted: #a3aec2;
+  --color-neutral-bg: #0d131e;
+  --color-neutral-surface: #131b29;
+  --color-neutral-soft: #1a2333;
+  --color-neutral-recessed: #202a3c;
+  --color-neutral-line-soft: #1d2635;
+  --color-neutral-line: #263145;
+  --color-neutral-line-strong: #3a475e;
+
+  --color-text-strong: #f3f6fa;
+  --color-text-default: #e2e7ef;
+  --color-text-muted: #b6c0cf;
+  --color-text-subtle: #94a1b5;
+  --color-text-on-dark-muted: #b9d6f5;
+
   --color-brand-primary: #8fb0ee;
   --color-brand-primary-strong: #a8c3f5;
   --color-brand-primary-soft: #233252;
   --color-brand-on-primary: #0f1a30;
-  --color-header: #151c2b;
-  --color-header-strong: #2a3242;
-  --color-success: #86efac;
-  --color-success-soft: #14532d;
-  --color-danger: #f87171;
-  --color-danger-soft: #3b1d22;
-  --color-danger-line: #7f1d1d;
+  --color-brand-accent: #8fb0ee;
+  --color-brand-tint: #182338;
+  --color-link: #a8c3f5;
 
-  --shadow-card: 0px 2px 8px 0px rgba(0, 0, 0, 0.25),
-    0px 6px 20px 0px rgba(0, 0, 0, 0.35);
+  --color-band: #172f5e;
+  --color-band-deep: #0f1f3f;
+  --color-header: #172f5e;
+  --color-header-strong: #0f1f3f;
+
+  --color-success: #6ee7b7;
+  --color-success-soft: #0f2f26;
+  --color-warning: #fbbf6a;
+  --color-warning-soft: #33250e;
+  --color-danger: #f87171;
+  --color-danger-soft: #34181c;
+  --color-danger-line: #6b2329;
+
+  --shadow-edge: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.25), 0 8px 24px -8px rgb(0 0 0 / 0.45);
+  --shadow-pop: 0 12px 32px -8px rgb(0 0 0 / 0.55);
 }
 
-body {
-  @apply bg-neutral-bg font-body text-text-default antialiased;
+/* Umpan balik tekan: warna bertransisi 240ms, elemen sedikit mengecil saat ditekan. */
+@utility efek-tekan {
+  transition-property: color, background-color, border-color, box-shadow, scale;
+  transition-duration: 240ms, 240ms, 240ms, 240ms, 120ms;
+  transition-timing-function: var(--ease-standard);
+
+  &:active:not(:disabled) {
+    scale: 0.97;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &:active:not(:disabled) {
+      scale: none;
+    }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-neutral-bg font-sans text-text-default antialiased;
+  }
+
+  /* Bawaan browser untuk strong/b/th adalah 700. */
+  strong,
+  b,
+  th {
+    font-weight: 600;
+  }
+
+  h1,
+  h2 {
+    letter-spacing: -0.015em;
+  }
+
+  h3 {
+    letter-spacing: -0.005em;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-accent;
+  }
 }

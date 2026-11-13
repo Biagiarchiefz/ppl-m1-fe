@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
-import Modal from "../../../components/common/Modal/Modal";
+import { Shield } from "lucide-react";
+import Modal, { ModalFooter } from "../../../components/common/Modal/Modal";
 import Input from "../../../components/common/Input/Input";
 import Button from "../../../components/common/Button/Button";
 import Alert from "../../../components/common/Alert/Alert";
@@ -52,7 +53,7 @@ const RoleFormModal = ({ role, permissions, onClose, onSaved }: RoleFormModalPro
   }
 
   return (
-    <Modal title={isEdit ? "Ubah peran" : "Tambah peran"} onClose={onClose}>
+    <Modal title={isEdit ? "Ubah peran" : "Tambah peran"} description="Pilih izin yang dimiliki pengguna dengan peran ini." icon={Shield} size="lg" onClose={onClose}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
         {error && <Alert>{error}</Alert>}
         {!isEdit && (
@@ -66,7 +67,7 @@ const RoleFormModal = ({ role, permissions, onClose, onSaved }: RoleFormModalPro
           {fields.permissions && <p className="text-xs text-danger">{fields.permissions}</p>}
           {groupByModule(permissions).map(([module, perms]) => (
             <div key={module} className="rounded-field border border-neutral-line p-3">
-              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-neutral-line-strong">Modul {module}</p>
+              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-text-subtle">Modul {module}</p>
               {perms.map((p) => (
                 <label key={p.code} className="flex cursor-pointer items-start gap-2 py-1 text-sm">
                   <input type="checkbox" checked={selected.includes(p.code)} onChange={() => toggle(p.code)} className="mt-1 accent-brand-primary" />
@@ -80,14 +81,14 @@ const RoleFormModal = ({ role, permissions, onClose, onSaved }: RoleFormModalPro
           ))}
         </fieldset>
 
-        <div className="mt-2 flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="h-10 rounded-field border border-neutral-line px-4 text-sm font-semibold text-text-muted hover:bg-neutral-bg">
+        <ModalFooter>
+          <Button type="button" variant="secondary" onClick={onClose}>
             Batal
-          </button>
-          <Button type="submit" disabled={loading} className="w-auto! px-5 disabled:cursor-wait disabled:opacity-70">
+          </Button>
+          <Button type="submit" loading={loading} className="sm:w-auto">
             {loading ? "Menyimpan..." : "Simpan"}
           </Button>
-        </div>
+        </ModalFooter>
       </form>
     </Modal>
   );

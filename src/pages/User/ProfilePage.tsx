@@ -39,8 +39,8 @@ const ProfilePage = () => {
 
   return (
     <AdminLayout>
-      <div className="p-7">
-        <h1 className="font-body text-[32px] font-semibold leading-10 text-text-default">Profil saya</h1>
+      <div>
+        <h1 className="text-2xl leading-tight font-medium text-text-strong">Profil saya</h1>
         <p className="mt-1 text-sm leading-[22px] text-text-muted">Informasi akun Anda.</p>
 
         {notice && <div className="mt-4 max-w-[560px]"><Alert tone="success">{notice}</Alert></div>}
@@ -58,7 +58,7 @@ const ProfilePage = () => {
               ))}
             </dl>
           )}
-          <button type="button" onClick={() => setChangingPassword(true)} className="mt-6 flex h-10 items-center justify-center gap-2 rounded-field bg-brand-primary px-4 text-sm font-semibold text-brand-on-primary hover:bg-brand-primary-strong">
+          <button type="button" onClick={() => setChangingPassword(true)} className="mt-6 flex min-h-10 items-center justify-center gap-2 rounded-full efek-tekan bg-brand-primary px-5 text-sm font-medium text-brand-on-primary hover:bg-brand-primary-strong">
             <KeyRound size={16} aria-hidden />
             Ubah kata sandi
           </button>

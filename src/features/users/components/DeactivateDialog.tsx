@@ -1,5 +1,7 @@
 import { useState } from "react";
-import Modal from "../../../components/common/Modal/Modal";
+import { UserX } from "lucide-react";
+import Modal, { ModalFooter } from "../../../components/common/Modal/Modal";
+import Button from "../../../components/common/Button/Button";
 import Alert from "../../../components/common/Alert/Alert";
 import { ApiError } from "../../../services/api";
 import { deactivateUser, type User } from "..";
@@ -29,22 +31,30 @@ const DeactivateDialog = ({ user, onClose, onDone }: DeactivateDialogProps) => {
   }
 
   return (
-    <Modal title="Nonaktifkan akun" onClose={onClose}>
+    <Modal title="Nonaktifkan akun" icon={UserX} tone="danger" size="sm" onClose={onClose}>
       <div className="flex flex-col gap-4">
         {error && <Alert>{error}</Alert>}
-        <p className="text-sm leading-6 text-text-muted">
-          Akun <strong className="text-text-default">{user.name}</strong> ({user.email}) tidak akan bisa login lagi.
-          Data dan riwayat audit log akun tetap tersimpan.
-        </p>
-        <div className="flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="h-10 rounded-field border border-neutral-line px-4 text-sm font-semibold text-text-muted hover:bg-neutral-bg">
-            Batal
-          </button>
-          <button type="button" onClick={handleConfirm} disabled={loading} className="h-10 rounded-field bg-red-600 px-4 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-wait disabled:opacity-70">
-            {loading ? "Memproses..." : "Nonaktifkan"}
-          </button>
+        <div className="flex items-center gap-3 rounded-xl border border-neutral-line bg-neutral-bg p-3">
+          <span aria-hidden className="grid size-9 shrink-0 place-items-center rounded-full bg-brand-primary text-sm font-semibold text-brand-on-primary">
+            {(user.name.trim()[0] ?? "?").toUpperCase()}
+          </span>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium text-text-strong">{user.name}</p>
+            <p className="truncate text-xs text-text-muted">{user.email}</p>
+          </div>
         </div>
+        <p className="text-sm leading-6 text-text-muted">
+          Akun ini tidak akan bisa login lagi. Data dan riwayat audit log akun tetap tersimpan, dan akun bisa diaktifkan kembali kapan saja.
+        </p>
       </div>
+      <ModalFooter>
+        <Button type="button" variant="secondary" onClick={onClose}>
+          Batal
+        </Button>
+        <Button type="button" variant="danger" loading={loading} onClick={handleConfirm} className="sm:w-auto">
+          {loading ? "Memproses..." : "Nonaktifkan"}
+        </Button>
+      </ModalFooter>
     </Modal>
   );
 };
