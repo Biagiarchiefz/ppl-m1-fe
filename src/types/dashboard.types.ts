@@ -1,15 +1,8 @@
 import type { AuditLog } from "./audit.types";
 
-// Ringkasan dashboard admin.
+// Ringkasan dashboard super admin.
 
-export interface DashboardAccess {
-  users: boolean;
-  roles: boolean;
-  divisions: boolean;
-  audit: boolean;
-}
-
-// null = tidak punya izin atau permintaan gagal; kartunya menampilkan "—".
+// null = permintaan gagal; kartunya menampilkan "—".
 export interface DashboardStats {
   totalUsers: number | null;
   activeUsers: number | null;

@@ -3,7 +3,7 @@ import { ApiError, errorMessage } from "../services/api";
 
 // Tampilkan galat dari backend di form react-hook-form: pesan umum di
 // `errors.root.server`, galat per field (`error.fields`) di field masing-masing.
-// `fieldMap` memetakan nama field backend yang berbeda, mis. "admin.email" → "adminEmail".
+// `fieldMap` memetakan nama field backend yang berbeda, mis. "permission_codes" → "permissions".
 export function applyServerErrors<T extends FieldValues>(
   error: unknown,
   setError: UseFormSetError<T>,

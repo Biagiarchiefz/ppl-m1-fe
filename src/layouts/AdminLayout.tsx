@@ -1,6 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
 import {
-  Building2,
   FolderTree,
   History,
   LayoutDashboard,
@@ -18,8 +17,8 @@ import { NavLink, useLocation, useNavigate } from "react-router";
 import Logo from "../components/common/Logo/Logo";
 import ThemeToggle from "../components/common/ThemeToggle/ThemeToggle";
 import Tooltip from "../components/common/Tooltip/Tooltip";
-import { ADMIN_AREA_PERMS, PERM } from "../config/env";
-import { can, useAuthStore } from "../features/auth/stores/auth.store";
+import { logout as logoutRequest } from "../features/auth/services/auth.service";
+import { isSuperAdmin, selectLogout, selectUser, useAuthStore, useUiStore } from "../store";
 import ProfileMenu from "../features/auth/components/ProfileMenu";
 import type { SessionUser } from "../types";
 
@@ -31,7 +30,7 @@ interface NavItem {
   icon: LucideIcon;
   label: string;
   to: string;
-  perms?: string[]; // tampil bila pengguna punya salah satu izin ini
+  superAdminOnly?: boolean; // tampil hanya untuk super admin
   exact?: boolean;
 }
 
@@ -40,32 +39,26 @@ interface NavSection {
   items: NavItem[];
 }
 
+// Role admin biasa sudah dihapus: semua menu pengelolaan milik super admin.
 const sections: NavSection[] = [
   {
-    title: "Platform",
-    items: [
-      { icon: Building2, label: "Organisasi", to: "/platform/organizations", perms: [PERM.organizationsManage] },
-      { icon: History, label: "Audit log platform", to: "/platform/audit-logs", perms: [PERM.organizationsManage] },
-    ],
-  },
-  {
     title: "Utama",
-    items: [{ icon: LayoutDashboard, label: "Dashboard", to: "/admin", exact: true, perms: ADMIN_AREA_PERMS }],
+    items: [{ icon: LayoutDashboard, label: "Dashboard", to: "/admin", exact: true, superAdminOnly: true }],
   },
   {
     title: "Pengguna & akses",
     items: [
-      { icon: Users, label: "Pengguna", to: "/admin/users", perms: [PERM.usersRead, PERM.usersManage] },
-      { icon: Shield, label: "Peran & izin", to: "/admin/roles", perms: [PERM.rolesManage] },
-      { icon: FolderTree, label: "Divisi", to: "/admin/divisions", perms: [PERM.divisionsManage] },
-      { icon: History, label: "Audit log", to: "/admin/audit-logs", perms: [PERM.auditRead] },
+      { icon: Users, label: "Pengguna", to: "/admin/users", superAdminOnly: true },
+      { icon: Shield, label: "Peran & izin", to: "/admin/roles", superAdminOnly: true },
+      { icon: FolderTree, label: "Divisi", to: "/admin/divisions", superAdminOnly: true },
+      { icon: History, label: "Audit log", to: "/admin/audit-logs", superAdminOnly: true },
     ],
   },
 ];
 
 function visibleSections(user: SessionUser | null): NavSection[] {
   return sections
-    .map((s) => ({ ...s, items: s.items.filter((it) => !it.perms || can(user, ...it.perms)) }))
+    .map((s) => ({ ...s, items: s.items.filter((it) => !it.superAdminOnly || isSuperAdmin(user)) }))
     .filter((s) => s.items.length > 0);
 }
 
@@ -77,25 +70,6 @@ function activePage(user: SessionUser | null, pathname: string): { section: stri
   // Profil tidak ada di sidebar (dibuka dari menu akun di navbar).
   if (pathname.startsWith("/profile")) return { section: "Akun", label: "Profil saya" };
   return null;
-}
-
-// Pilihan ciut/lebar sidebar hanya kenyamanan per peramban; gagal baca/tulis = kembali ke bawaan (lebar).
-const COLLAPSE_KEY = "sidebar_collapsed";
-
-function readCollapsed(): boolean {
-  try {
-    return localStorage.getItem(COLLAPSE_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-function saveCollapsed(collapsed: boolean) {
-  try {
-    localStorage.setItem(COLLAPSE_KEY, collapsed ? "1" : "0");
-  } catch {
-    // Penyimpanan diblokir (mode privat): pilihan tidak diingat.
-  }
 }
 
 function linkClass(collapsed: boolean) {
@@ -185,9 +159,11 @@ const Sidebar = ({ user, collapsed = false, onToggleCollapse, onNavigate, onClos
 const AdminLayout = ({ children }: AdminLayoutProps) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const user = useAuthStore((s) => s.user);
-  const logout = useAuthStore((s) => s.logout);
-  const [collapsed, setCollapsed] = useState(readCollapsed);
+  const user = useAuthStore(selectUser);
+  const logout = useAuthStore(selectLogout);
+  // Ciut/lebar sidebar disimpan per peramban lewat store UI.
+  const collapsed = useUiStore((s) => s.sidebarCollapsed);
+  const toggleCollapse = useUiStore((s) => s.toggleSidebar);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const page = activePage(user, location.pathname);
 
@@ -202,12 +178,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     };
   }, [drawerOpen]);
 
-  function toggleCollapse() {
-    setCollapsed(!collapsed);
-    saveCollapsed(!collapsed);
-  }
-
   function handleLogout() {
+    // Backend tidak mencabut JWT; panggilan ini hanya melengkapi alur logout,
+    // jadi kegagalannya diabaikan dan sesi lokal tetap dihapus.
+    const token = useAuthStore.getState().token;
+    if (token) logoutRequest(token).catch(() => undefined);
     logout();
     navigate("/login", { replace: true });
   }

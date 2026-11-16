@@ -1,32 +1,30 @@
 // Sesi, akun yang sedang login, dan form ubah kata sandi.
 
+// Profil dari GET /me (klaim JWT). Backend tidak mengirim daftar izin;
+// akses menu ditentukan dari `is_super_admin`.
 export interface SessionUser {
   user_id: number;
   name: string;
-  organization_id: number | null;
   role: string;
-  permissions: string[];
   division: string | null;
+  partner_id: number | null;
   unit_usaha_id: number | null;
+  is_super_admin: boolean;
 }
 
+// POST /auth/login hanya mengembalikan token; profil diambil lewat GET /me.
 export interface LoginResult {
   access_token: string;
   token_type: string;
   expires_in: number;
-  user: SessionUser;
 }
 
-export interface Me extends SessionUser {
-  email: string;
-  organization_name: string | null;
-  is_active: boolean;
-}
+export type Me = SessionUser;
 
 export interface ChangePasswordForm {
   old_password: string;
   new_password: string;
-  confirmation: string;
+  confirm_password: string;
 }
 
 export interface LoginForm {

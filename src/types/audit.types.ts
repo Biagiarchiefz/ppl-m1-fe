@@ -1,12 +1,10 @@
-// Audit log organisasi dan platform.
+// Audit log platform (GET /platform/audit-logs, khusus super admin).
 
-// actor_name, actor_email, dan organization_name adalah salinan saat
-// kejadian: tetap terisi walau pengguna/organisasinya sudah dihapus permanen
-// (user_id/organization_id lalu menjadi null).
+// actor_name dan actor_email adalah salinan saat kejadian, jadi tetap
+// terisi walau user_id sudah null.
 export interface AuditLog {
   id: number;
-  organization_id: number | null;
-  organization_name: string | null;
+  partner_id: number | null;
   user_id: number | null;
   actor_name: string | null;
   actor_email: string | null;
@@ -19,16 +17,8 @@ export interface AuditLog {
   created_at: string;
 }
 
+// Backend hanya menerima parameter halaman.
 export interface AuditFilter {
   page: number;
   per_page?: number;
-  from?: string;
-  to?: string;
-  user_id?: string;
-  organization_id?: string;
-  action?: string;
-  resource?: string;
-  sort?: string;
 }
-
-export type AuditScope = "organization" | "platform";

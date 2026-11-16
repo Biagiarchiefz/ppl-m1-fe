@@ -1,12 +1,8 @@
-import { ADMIN_AREA_PERMS, PERM } from "../config/env";
-import { can, useAuthStore } from "../features/auth/stores/auth.store";
+import { isSuperAdmin, useAuthStore } from "../store";
 
-// Halaman awal sesuai izin: super admin ke daftar organisasi, pengelola
-// organisasi ke /admin, pengguna lain ke profil.
+// Halaman awal: super admin ke dashboard pengelolaan, pengguna lain ke profil.
 export function homePath(): string {
   const { user } = useAuthStore.getState();
   if (!user) return "/login";
-  if (can(user, PERM.organizationsManage)) return "/platform/organizations";
-  if (can(user, ...ADMIN_AREA_PERMS)) return "/admin";
-  return "/profile";
+  return isSuperAdmin(user) ? "/admin" : "/profile";
 }

@@ -1,10 +1,9 @@
 import AdminLayout from "../../layouts/AdminLayout";
 import AuditLogs from "../../features/audit/components/views/AuditLogs";
-import type { AuditScope } from "../../types";
 
-const AuditLogsPage = ({ scope = "organization" }: { scope?: AuditScope }) => (
+const AuditLogsPage = () => (
   <AdminLayout>
-    <AuditLogs scope={scope} />
+    <AuditLogs />
   </AdminLayout>
 );
 

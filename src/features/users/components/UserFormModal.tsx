@@ -23,9 +23,12 @@ const UserFormModal = ({ user, roles, divisions, onClose, onSaved }: UserFormMod
   const { isEdit, register, control, errors, error, loading, onSubmit } = useUserForm(user, onSaved);
 
   return (
-    <Modal title={isEdit ? "Ubah pengguna" : "Tambah pengguna"} description={isEdit ? "Perbarui peran, divisi, atau unit usaha pengguna." : "Akun baru langsung bisa dipakai untuk masuk."} icon={isEdit ? UserPen : UserPlus} onClose={onClose}>
+    <Modal title={isEdit ? "Ubah pengguna" : "Tambah pengguna"} description={isEdit ? "Perbarui nama, peran, divisi, atau unit usaha pengguna." : "Akun baru langsung aktif dan bisa dipakai untuk masuk."} icon={isEdit ? UserPen : UserPlus} onClose={onClose}>
       <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
         {error && <Alert>{error}</Alert>}
+        {!isEdit && (
+          <Input label="ID partner" id="user-partner" type="number" min={1} placeholder="mis. 15" error={errors.partner_id?.message} hint="Partner tidak bisa diubah setelah akun dibuat." {...register("partner_id")} />
+        )}
         <Input label="Nama lengkap" id="user-name" placeholder="Masukkan nama lengkap" error={errors.name?.message} {...register("name")} />
         {!isEdit && (
           <>
@@ -44,10 +47,10 @@ const UserFormModal = ({ user, roles, divisions, onClose, onSaved }: UserFormMod
           control={control}
           name="division"
           render={({ field }) => (
-            <Select label="Divisi" id="user-division" value={field.value} options={toOptions(divisions)} onChange={field.onChange} placeholder="Tanpa divisi" error={errors.division?.message} />
+            <Select label="Divisi" id="user-division" value={field.value} options={toOptions(divisions)} onChange={field.onChange} placeholder="Pilih divisi" error={errors.division?.message} />
           )}
         />
-        <Input label="ID unit usaha (opsional)" id="user-unit" type="number" placeholder="Kosongkan bila tidak terikat unit usaha" error={errors.unit_usaha_id?.message} {...register("unit_usaha_id")} />
+        <Input label="ID unit usaha (opsional)" id="user-unit" type="number" min={1} placeholder="Kosongkan bila tidak terikat unit usaha" error={errors.unit_usaha_id?.message} {...register("unit_usaha_id")} />
         <ModalFooter>
           <Button type="button" variant="secondary" onClick={onClose}>
             Batal

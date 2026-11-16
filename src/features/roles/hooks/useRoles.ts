@@ -1,24 +1,23 @@
 import { useEffect, useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { activateRole, deactivateRole, listPermissions, listRoles, roleKeys } from "../services/roles.service";
+import { listPermissions, listRoles, roleKeys } from "../services/roles.service";
 import { errorMessage } from "../../../services/api";
-import { useApiMutation } from "../../../hooks/useApiMutation";
 import type { RoleDialog } from "../../../types";
+import { toast } from "../../../store";
+import { PAGE_SIZE } from "../../../utils/pagination";
 
-// Peran milik organisasi beserta izinnya. Peran "administrator" bawaan
-// otomatis memiliki semua izin dan tidak dapat diubah.
+// Peran global platform (partner_id NULL) dan katalog izin.
 export function useRoles() {
   const [page, setPage] = useState(1);
   const [dialog, setDialog] = useState<RoleDialog>(null);
-  const [notice, setNotice] = useState("");
 
   useEffect(() => {
     document.title = "Peran & Izin";
   }, []);
 
   const { data, error, isFetching } = useQuery({
-    queryKey: roleKeys.list({ page }),
-    queryFn: () => listRoles({ page }),
+    queryKey: roleKeys.list({ page, per_page: PAGE_SIZE }),
+    queryFn: () => listRoles({ page, per_page: PAGE_SIZE }),
     placeholderData: keepPreviousData,
   });
   const roles = data?.data ?? [];
@@ -30,12 +29,9 @@ export function useRoles() {
     select: (result) => result.data,
   });
 
-  const activate = useApiMutation(activateRole, [roleKeys.all]);
-  const deactivate = useApiMutation(deactivateRole, [roleKeys.all]);
-
   function onSaved(message: string) {
     setDialog(null);
-    setNotice(message);
+    toast.success(message);
   }
 
   const closeDialog = () => setDialog(null);
@@ -50,9 +46,6 @@ export function useRoles() {
     dialog,
     setDialog,
     closeDialog,
-    notice,
     onSaved,
-    activateRole: activate.mutateAsync,
-    deactivateRole: deactivate.mutateAsync,
   };
 }

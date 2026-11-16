@@ -4,10 +4,11 @@ import { createUser, updateUser, userKeys } from "../services/users.service";
 import { userSchema } from "../schemas/users.schema";
 import { useApiMutation } from "../../../hooks/useApiMutation";
 import { applyServerErrors } from "../../../utils/formErrors";
-import type { User, UserFormState } from "../../../types";
+import type { CreateUserInput, UpdateUserInput, User, UserFormState } from "../../../types";
 
 function initialForm(user: User | null): UserFormState {
   return {
+    partner_id: user?.partner_id == null ? "" : String(user.partner_id),
     name: user?.name ?? "",
     email: user?.email ?? "",
     password: "",
@@ -17,14 +18,29 @@ function initialForm(user: User | null): UserFormState {
   };
 }
 
-// Field kosong dikirim sebagai null (Panduan 4.5), bukan teks kosong.
-function toPayload(form: UserFormState) {
+// POST /users: unit usaha kosong dikirim sebagai null (Panduan 4.5).
+function toCreatePayload(form: UserFormState): CreateUserInput {
+  const unit = form.unit_usaha_id.trim();
+  return {
+    partner_id: Number(form.partner_id.trim()),
+    name: form.name,
+    email: form.email,
+    password: form.password,
+    role: form.role,
+    division: form.division,
+    unit_usaha_id: unit === "" ? null : Number(unit),
+  };
+}
+
+// PATCH /users/{id}: email dan partner_id tidak bisa diubah, dan
+// unit_usaha_id tidak menerima null, jadi field kosong tidak dikirim.
+function toUpdatePayload(form: UserFormState): UpdateUserInput {
   const unit = form.unit_usaha_id.trim();
   return {
     name: form.name,
     role: form.role,
-    division: form.division || null,
-    unit_usaha_id: unit === "" ? null : Number(unit),
+    division: form.division,
+    unit_usaha_id: unit === "" ? undefined : Number(unit),
   };
 }
 
@@ -43,10 +59,7 @@ export function useUserForm(user: User | null, onSaved: (message: string) => voi
   });
 
   const mutation = useApiMutation(
-    (form: UserFormState) =>
-      user
-        ? updateUser(user.id, toPayload(form))
-        : createUser({ ...toPayload(form), email: form.email, password: form.password }),
+    (form: UserFormState) => (user ? updateUser(user.id, toUpdatePayload(form)) : createUser(toCreatePayload(form))),
     [userKeys.all],
   );
 

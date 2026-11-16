@@ -13,17 +13,13 @@ export function updateUser(id: number, input: UpdateUserInput) {
   return apiRequest<User>(`/users/${id}`, { method: "PATCH", body: input });
 }
 
+// Soft delete: akun dinonaktifkan, data historis tetap tersimpan.
 export function deactivateUser(id: number) {
   return apiRequest<{ id: number; is_active: boolean }>(`/users/${id}`, { method: "DELETE" });
 }
 
 export function activateUser(id: number) {
   return apiRequest<{ id: number; is_active: boolean }>(`/users/${id}/status`, { method: "PATCH", body: { is_active: true } });
-}
-
-// Hapus permanen akun yang sudah nonaktif. Audit log akun tetap tersimpan.
-export function deleteUser(id: number) {
-  return apiRequest<{ id: number; deleted: boolean }>(`/users/${id}/permanent`, { method: "DELETE" });
 }
 
 export const userKeys = {

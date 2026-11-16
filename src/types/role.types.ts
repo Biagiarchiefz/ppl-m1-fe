@@ -1,13 +1,12 @@
-// Peran & izin organisasi.
+// Peran global & katalog izin.
 
 export interface Role {
   id: number;
+  partner_id: number | null;
   code: string;
   name: string;
   description: string | null;
-  is_system: boolean;
   is_active: boolean;
-  permissions: string[];
   created_at: string;
 }
 
@@ -17,14 +16,20 @@ export interface Permission {
   description: string;
 }
 
-export interface RoleInput {
-  code?: string;
+export interface CreateRoleInput {
+  code: string;
   name: string;
-  description: string | null;
-  permissions: string[];
+  description?: string;
+  permission_codes: string[];
 }
 
-export type RoleDialog = { kind: "create" } | { kind: "edit"; role: Role } | { kind: "deactivate" | "activate"; role: Role } | null;
+export interface RolePermissions {
+  role_id: number;
+  permission_codes: string[];
+}
+
+// edit = mengganti daftar izin peran (PUT /roles/{id}/permissions).
+export type RoleDialog = { kind: "create" } | { kind: "edit"; role: Role } | null;
 
 export interface RoleForm {
   code: string;

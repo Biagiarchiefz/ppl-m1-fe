@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { activateUser, deleteUser, listUsers, userKeys } from "../services/users.service";
+import { activateUser, listUsers, userKeys } from "../services/users.service";
 import { useReferences } from "./useReferences";
-import { can, useAuthStore } from "../../auth/stores/auth.store";
-import { PERM } from "../../../config/env";
+import { selectUser, toast, useAuthStore } from "../../../store";
 import { errorMessage } from "../../../services/api";
 import { useApiMutation } from "../../../hooks/useApiMutation";
 import { useDebounce } from "../../../hooks/useDebounce";
+import { PAGE_SIZE } from "../../../utils/pagination";
 import type { UserDialog } from "../../../types";
 
 const STATUS_FILTER: Record<string, boolean | undefined> = {
@@ -21,25 +21,27 @@ export const STATUS_OPTIONS = [
   { value: "nonaktif", label: "Nonaktif" },
 ];
 
-// Daftar pengguna: pencarian, filter, halaman, dan dialog yang sedang terbuka.
+// Daftar akun seluruh partner (khusus super admin): pencarian, filter, halaman, dan dialog yang sedang terbuka.
 export function useUsers() {
   const { roles, divisions } = useReferences();
-  const sessionUser = useAuthStore((s) => s.user);
+  const sessionUser = useAuthStore(selectUser);
   const currentUserId = sessionUser?.user_id;
-  const canManage = can(sessionUser, PERM.usersManage);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("semua");
   const [role, setRole] = useState("");
+  const [partner, setPartner] = useState("");
   const [page, setPage] = useState(1);
   const [dialog, setDialog] = useState<UserDialog>(null);
-  const [notice, setNotice] = useState("");
   const q = useDebounce(query.trim());
+  const partnerInput = useDebounce(partner.trim());
+  // Filter partner hanya dikirim bila berupa angka bulat positif.
+  const partnerId = /^[1-9]\d*$/.test(partnerInput) ? Number(partnerInput) : undefined;
 
   useEffect(() => {
     document.title = "Pengguna";
   }, []);
 
-  const filter = { page, q, role, is_active: STATUS_FILTER[status] };
+  const filter = { page, per_page: PAGE_SIZE, q, role, partner_id: partnerId, is_active: STATUS_FILTER[status] };
   // keepPreviousData: data lama tetap tampil selama halaman/filter baru dimuat.
   const { data, error, isFetching } = useQuery({
     queryKey: userKeys.list(filter),
@@ -47,10 +49,9 @@ export function useUsers() {
     placeholderData: keepPreviousData,
   });
   const users = data?.data ?? [];
-  const hasFilter = Boolean(q || role || status !== "semua");
+  const hasFilter = Boolean(q || role || partnerId || status !== "semua");
 
   const activate = useApiMutation(activateUser, [userKeys.all]);
-  const remove = useApiMutation(deleteUser, [userKeys.all]);
 
   // Mengubah filter selalu kembali ke halaman pertama.
   const changeQuery = (value: string) => {
@@ -61,15 +62,19 @@ export function useUsers() {
     setRole(value);
     setPage(1);
   };
+  const changePartner = (value: string) => {
+    setPartner(value);
+    setPage(1);
+  };
   const changeStatus = (value: string) => {
     setStatus(value);
     setPage(1);
   };
 
-  // Daftar sudah disegarkan oleh mutation; cukup tutup dialog dan tampilkan pesan.
+  // Daftar sudah disegarkan oleh mutation; cukup tutup dialog dan tampilkan toast.
   function onSaved(message: string) {
     setDialog(null);
-    setNotice(message);
+    toast.success(message);
   }
 
   const closeDialog = () => setDialog(null);
@@ -78,11 +83,12 @@ export function useUsers() {
     roles,
     divisions,
     currentUserId,
-    canManage,
     query,
     changeQuery,
     role,
     changeRole,
+    partner,
+    changePartner,
     status,
     changeStatus,
     setPage,
@@ -94,9 +100,7 @@ export function useUsers() {
     dialog,
     setDialog,
     closeDialog,
-    notice,
     onSaved,
     activateUser: activate.mutateAsync,
-    deleteUser: remove.mutateAsync,
   };
 }

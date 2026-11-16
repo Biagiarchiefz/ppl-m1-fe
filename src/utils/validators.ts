@@ -34,10 +34,16 @@ export const emailField = () =>
 export const passwordField = (message = "Kata sandi tidak memenuhi aturan") =>
   z.string().refine(isValidPassword, { error: message });
 
-/** Kode (peran, divisi, organisasi): huruf kecil, angka, - atau _. */
+/** Kode (peran, divisi): huruf kecil, angka, - atau _ (pola backend; tidak boleh diawali/diakhiri - atau _). */
 export const codeField = () =>
-  requiredText().refine((value) => /^[a-z0-9_-]+$/.test(value), {
-    error: "Hanya huruf kecil, angka, - atau _",
+  requiredText().refine((value) => /^[a-z0-9]+([_-][a-z0-9]+)*$/.test(value), {
+    error: "Hanya huruf kecil, angka, - atau _ (tidak di awal/akhir)",
+  });
+
+/** Angka bulat positif yang wajib diisi (mis. ID partner). */
+export const positiveInt = () =>
+  requiredText().refine((value) => /^[1-9]\d*$/.test(value.trim()), {
+    error: "Harus berupa angka bulat positif",
   });
 
 /** Angka bulat positif yang boleh dikosongkan (dikirim sebagai null). */

@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createRole, roleKeys, updateRole } from "../services/roles.service";
+import { createRole, roleKeys, setRolePermissions } from "../services/roles.service";
 import { roleSchema } from "../schemas/roles.schema";
 import { useApiMutation } from "../../../hooks/useApiMutation";
 import { applyServerErrors } from "../../../utils/formErrors";
@@ -15,8 +15,9 @@ export function groupByModule(permissions: Permission[]): [string, Permission[]]
 export const togglePermission = (selected: string[], perm: string) =>
   selected.includes(perm) ? selected.filter((p) => p !== perm) : [...selected, perm];
 
-// role = null berarti peran baru.
-export function useRoleForm(role: Role | null, onSaved: (message: string) => void) {
+// role = null berarti peran baru (POST /roles). Untuk peran yang sudah ada,
+// backend hanya mengizinkan penggantian daftar izin (PUT /roles/{id}/permissions).
+export function useRoleForm(role: Role | null, initialPermissions: string[], onSaved: (message: string) => void) {
   const isEdit = role !== null;
   const {
     register,
@@ -29,22 +30,31 @@ export function useRoleForm(role: Role | null, onSaved: (message: string) => voi
       code: role?.code ?? "",
       name: role?.name ?? "",
       description: role?.description ?? "",
-      permissions: role?.permissions ?? [],
+      permissions: initialPermissions,
     },
     resolver: zodResolver(roleSchema(isEdit)),
   });
 
-  const mutation = useApiMutation((form: RoleForm) => {
-    const body = { name: form.name, description: form.description.trim() || null, permissions: form.permissions };
-    return role ? updateRole(role.id, body) : createRole({ ...body, code: form.code });
-  }, [roleKeys.all]);
+  const mutation = useApiMutation(
+    (form: RoleForm): Promise<unknown> =>
+      role
+        ? setRolePermissions(role.id, form.permissions)
+        : createRole({
+            code: form.code,
+            name: form.name,
+            // Deskripsi bertipe string (tidak nullable) di backend; kosong = tidak dikirim.
+            description: form.description.trim() || undefined,
+            permission_codes: form.permissions,
+          }),
+    [roleKeys.all],
+  );
 
   const onSubmit = handleSubmit(async (form) => {
     try {
       await mutation.mutateAsync(form);
-      onSaved(isEdit ? "Peran berhasil diperbarui." : "Peran baru berhasil ditambahkan.");
+      onSaved(role ? `Izin peran ${role.name} berhasil diperbarui.` : "Peran baru berhasil ditambahkan.");
     } catch (err) {
-      applyServerErrors(err, setError);
+      applyServerErrors(err, setError, { permission_codes: "permissions" });
     }
   });
 

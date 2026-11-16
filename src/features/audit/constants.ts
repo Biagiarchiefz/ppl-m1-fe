@@ -4,7 +4,6 @@ export const AUDIT_ACTIONS: Record<string, string> = {
   "user.updated": "Akun diubah",
   "user.activated": "Akun diaktifkan kembali",
   "user.deactivated": "Akun dinonaktifkan",
-  "user.deleted": "Akun dihapus permanen",
   "user.password_changed": "Kata sandi diganti",
   "auth.login_succeeded": "Login berhasil",
   "auth.login_failed": "Login gagal",
@@ -16,9 +15,4 @@ export const AUDIT_ACTIONS: Record<string, string> = {
   "division.updated": "Divisi diubah",
   "division.activated": "Divisi diaktifkan kembali",
   "division.deactivated": "Divisi dinonaktifkan",
-  "organization.created": "Organisasi dibuat",
-  "organization.updated": "Organisasi diubah",
-  "organization.activated": "Organisasi diaktifkan kembali",
-  "organization.deactivated": "Organisasi dinonaktifkan",
-  "organization.deleted": "Organisasi dihapus permanen",
 };

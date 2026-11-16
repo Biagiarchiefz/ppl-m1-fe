@@ -20,7 +20,7 @@ const ChangePasswordModal = ({ onClose, onSaved }: ChangePasswordModalProps) => 
         {error && <Alert>{error}</Alert>}
         <Input label="Kata sandi lama" icon={LockKeyhole} id="old_password" type="password" autoComplete="current-password" showPasswordToggle placeholder="Masukkan kata sandi lama" error={errors.old_password?.message} {...fields.old_password} />
         <Input label="Kata sandi baru" icon={LockKeyhole} id="new_password" type="password" autoComplete="new-password" showPasswordToggle placeholder="Masukkan kata sandi baru" error={errors.new_password?.message} hint={PASSWORD_RULE_HINT} {...fields.new_password} />
-        <Input label="Konfirmasi kata sandi baru" icon={LockKeyhole} id="confirmation" type="password" autoComplete="new-password" showPasswordToggle placeholder="Ulangi kata sandi baru" error={errors.confirmation?.message} {...fields.confirmation} />
+        <Input label="Konfirmasi kata sandi baru" icon={LockKeyhole} id="confirm_password" type="password" autoComplete="new-password" showPasswordToggle placeholder="Ulangi kata sandi baru" error={errors.confirm_password?.message} {...fields.confirm_password} />
         <ModalFooter>
           <Button type="button" variant="secondary" onClick={onClose}>
             Batal

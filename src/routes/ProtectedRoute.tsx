@@ -1,23 +1,23 @@
 import { Navigate, Outlet, useLocation } from "react-router";
-import { can, useAuthStore } from "../features/auth/stores/auth.store";
+import { isSuperAdmin, selectToken, selectUser, useAuthStore } from "../store";
 
 interface ProtectedRouteProps {
-  // Lolos bila pengguna memiliki salah satu izin ini.
-  anyPermission?: string[];
+  // true: hanya super admin yang boleh membuka rute ini.
+  superAdminOnly?: boolean;
 }
 
-// Menu dan rute disembunyikan di UI berdasarkan izin di token, tetapi hak
-// akses tetap dijaga backend (403 FORBIDDEN).
-const ProtectedRoute = ({ anyPermission }: ProtectedRouteProps) => {
+// Rute disembunyikan di UI berdasarkan `is_super_admin` dari GET /me, tetapi
+// hak akses tetap dijaga backend (403 FORBIDDEN).
+const ProtectedRoute = ({ superAdminOnly = false }: ProtectedRouteProps) => {
   const location = useLocation();
-  const token = useAuthStore((s) => s.token);
-  const user = useAuthStore((s) => s.user);
+  const token = useAuthStore(selectToken);
+  const user = useAuthStore(selectUser);
 
   if (!token || !user) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  if (anyPermission && !can(user, ...anyPermission)) {
+  if (superAdminOnly && !isSuperAdmin(user)) {
     return <Navigate to="/forbidden" replace state={{ from: location }} />;
   }
 

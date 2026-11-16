@@ -1,4 +1,5 @@
 import type { ListMeta } from "../../../types";
+import { PAGE_SIZE } from "../../../utils/pagination";
 
 interface PaginationProps {
   meta: ListMeta | null;
@@ -13,6 +14,9 @@ const buttonClass =
 const Pagination = ({ meta, itemCount, noun, onPageChange }: PaginationProps) => {
   const page = meta?.page ?? 1;
   const totalPages = meta?.total_pages ?? 0;
+
+  // Data yang muat dalam satu halaman (≤ PAGE_SIZE) tidak perlu pagination.
+  if (!meta || meta.total <= PAGE_SIZE) return null;
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-2 border-t border-neutral-line px-4 py-3 text-sm text-text-muted">

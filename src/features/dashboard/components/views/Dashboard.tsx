@@ -8,7 +8,7 @@ import QuickLinks from "../QuickLinks";
 import { useDashboard } from "../../hooks/useDashboard";
 
 const Dashboard = () => {
-  const { access, data, loading, firstName, todayLabel } = useDashboard();
+  const { data, loading, firstName, todayLabel } = useDashboard();
 
   return (
     <>
@@ -27,37 +27,31 @@ const Dashboard = () => {
               Selamat datang, {firstName}
             </h1>
             <p className="mt-1.5 text-sm leading-relaxed text-text-on-dark-muted">
-              Ringkasan pengguna, peran, dan aktivitas akses di organisasi Anda.
+              Ringkasan pengguna, peran, divisi, dan aktivitas di seluruh platform.
             </p>
-            {access.users && (
-              <Link
-                to="/admin/users"
-                className="group mt-5 inline-flex min-h-10 items-center gap-2 rounded-full bg-neutral-surface px-5 text-sm font-medium text-band efek-tekan hover:bg-brand-primary-soft dark:text-text-strong"
-              >
-                Kelola pengguna
-                <ArrowRight size={16} strokeWidth={1.5} aria-hidden className="transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transition-none" />
-              </Link>
-            )}
+            <Link
+              to="/admin/users"
+              className="group mt-5 inline-flex min-h-10 items-center gap-2 rounded-full bg-neutral-surface px-5 text-sm font-medium text-band efek-tekan hover:bg-brand-primary-soft dark:text-text-strong"
+            >
+              Kelola pengguna
+              <ArrowRight size={16} strokeWidth={1.5} aria-hidden className="transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transition-none" />
+            </Link>
           </div>
         </section>
 
         <section aria-label="Ringkasan" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <StatCard icon={Users} label="Total pengguna" value={data?.totalUsers ?? null} loading={loading && access.users} />
-          <StatCard icon={UserCheck} label="Pengguna aktif" value={data?.activeUsers ?? null} loading={loading && access.users} />
-          <StatCard icon={Shield} label="Peran aktif" value={data?.activeRoles ?? null} loading={loading && access.roles} />
-          <StatCard icon={FolderTree} label="Divisi aktif" value={data?.activeDivisions ?? null} loading={loading && access.divisions} />
+          <StatCard icon={Users} label="Total pengguna" value={data?.totalUsers ?? null} loading={loading} />
+          <StatCard icon={UserCheck} label="Pengguna aktif" value={data?.activeUsers ?? null} loading={loading} />
+          <StatCard icon={Shield} label="Peran aktif" value={data?.activeRoles ?? null} loading={loading} />
+          <StatCard icon={FolderTree} label="Divisi aktif" value={data?.activeDivisions ?? null} loading={loading} />
         </section>
 
         {/* grid-cols-1 + min-w-0: kolom di ponsel tidak melebar mengikuti teks terpanjang. */}
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-          {access.audit ? (
-            <RecentActivity logs={data?.recentLogs ?? null} loading={loading} />
-          ) : (
-            <UserStatusBar total={data?.totalUsers ?? null} active={data?.activeUsers ?? null} />
-          )}
+          <RecentActivity logs={data?.recentLogs ?? null} loading={loading} />
           <div className="flex min-w-0 flex-col gap-3">
-            {access.audit && <UserStatusBar total={data?.totalUsers ?? null} active={data?.activeUsers ?? null} />}
-            <QuickLinks access={access} />
+            <UserStatusBar total={data?.totalUsers ?? null} active={data?.activeUsers ?? null} />
+            <QuickLinks />
           </div>
         </div>
       </div>

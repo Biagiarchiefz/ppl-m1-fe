@@ -4,16 +4,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router";
 import { homePath } from "../../../routes/homePath";
 import { applyServerErrors } from "../../../utils/formErrors";
-import { login } from "../services/auth.service";
+import { getMe, login } from "../services/auth.service";
 import { loginSchema } from "../schemas/auth.schema";
-import { useAuthStore } from "../stores/auth.store";
+import { selectLogin, useAuthStore } from "../../../store";
 import type { LoginForm } from "../../../types";
 
-// Form masuk: kirim ke /auth/login, simpan sesi di store, lalu arahkan ke
-// halaman awal sesuai izin pengguna.
+// Form masuk: POST /auth/login hanya mengembalikan token, jadi profil
+// (termasuk is_super_admin) diambil dari GET /me sebelum sesi disimpan.
 export function useLogin() {
   const navigate = useNavigate();
-  const saveSession = useAuthStore((s) => s.login);
+  const saveSession = useAuthStore(selectLogin);
   const {
     register,
     handleSubmit,
@@ -25,13 +25,17 @@ export function useLogin() {
   });
 
   const mutation = useMutation({
-    mutationFn: ({ email, password }: LoginForm) => login(email, password),
+    mutationFn: async ({ email, password }: LoginForm) => {
+      const { access_token } = await login(email, password);
+      const user = await getMe(access_token);
+      return { token: access_token, user };
+    },
   });
 
   const onSubmit = handleSubmit(async (values) => {
     try {
       const result = await mutation.mutateAsync(values);
-      saveSession(result.access_token, result.user, values.remember);
+      saveSession(result.token, result.user, values.remember);
       navigate(homePath(), { replace: true });
     } catch (err) {
       applyServerErrors(err, setError);

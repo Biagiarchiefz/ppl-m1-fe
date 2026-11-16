@@ -14,13 +14,13 @@ export const changePasswordSchema = z
   .object({
     old_password: requiredText(),
     new_password: z.string(),
-    confirmation: z.string(),
+    confirm_password: z.string(),
   })
   .refine((v) => isValidPassword(v.new_password) && v.new_password !== v.old_password, {
     path: ["new_password"],
     error: "Kata sandi baru tidak memenuhi aturan",
   })
-  .refine((v) => v.confirmation === v.new_password, {
-    path: ["confirmation"],
+  .refine((v) => v.confirm_password === v.new_password, {
+    path: ["confirm_password"],
     error: "Konfirmasi kata sandi tidak cocok",
   }) satisfies z.ZodType<ChangePasswordForm, ChangePasswordForm>;

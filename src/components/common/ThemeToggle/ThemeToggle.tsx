@@ -1,12 +1,13 @@
 import { Moon, Sun } from "lucide-react";
-import { useTheme } from "../../../hooks/useTheme";
+import { useUiStore } from "../../../store";
 
 interface ThemeToggleProps {
   className?: string;
 }
 
 const ThemeToggle = ({ className = "text-text-muted hover:bg-neutral-recessed hover:text-text-strong" }: ThemeToggleProps) => {
-  const { theme, toggleTheme } = useTheme();
+  const theme = useUiStore((s) => s.theme);
+  const toggleTheme = useUiStore((s) => s.toggleTheme);
   const label = theme === "dark" ? "Ganti ke tema terang" : "Ganti ke tema gelap";
   const Icon = theme === "dark" ? Sun : Moon;
 

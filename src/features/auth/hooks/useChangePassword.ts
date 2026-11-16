@@ -7,7 +7,7 @@ import { changePassword } from "../services/auth.service";
 import { changePasswordSchema } from "../schemas/auth.schema";
 import type { ChangePasswordForm } from "../../../types";
 
-const emptyForm: ChangePasswordForm = { old_password: "", new_password: "", confirmation: "" };
+const emptyForm: ChangePasswordForm = { old_password: "", new_password: "", confirm_password: "" };
 
 export function useChangePassword(onSaved: (message: string) => void) {
   const {
@@ -22,13 +22,13 @@ export function useChangePassword(onSaved: (message: string) => void) {
   });
 
   const mutation = useMutation({
-    mutationFn: (values: ChangePasswordForm) => changePassword(values.old_password, values.new_password),
+    mutationFn: (values: ChangePasswordForm) => changePassword(values.old_password, values.new_password, values.confirm_password),
   });
 
   const fields = {
     old_password: register("old_password"),
     new_password: register("new_password"),
-    confirmation: register("confirmation"),
+    confirm_password: register("confirm_password"),
   };
 
   const onSubmit = handleSubmit(async (values) => {

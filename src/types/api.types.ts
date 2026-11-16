@@ -15,11 +15,13 @@ export interface ListResult<T> {
 export type Query = Record<string, string | number | boolean | null | undefined>;
 
 export interface RequestOptions {
-  method?: "GET" | "POST" | "PATCH" | "DELETE";
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: unknown;
   query?: Query;
   // false untuk endpoint publik (login): 401 tidak memicu logout otomatis.
   auth?: boolean;
+  // Token eksplisit, dipakai sebelum sesi tersimpan di store (GET /me setelah login).
+  token?: string;
 }
 
 // Bungkus standar semua respons backend M1.

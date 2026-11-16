@@ -1,6 +1,6 @@
 import axios, { type AxiosError } from "axios";
 import { API_BASE_URL } from "../config/env";
-import { useAuthStore } from "../features/auth/stores/auth.store";
+import { useAuthStore } from "../store";
 import type { ApiEnvelope, ListMeta, ListResult, Query, RequestOptions } from "../types";
 
 declare module "axios" {
@@ -32,7 +32,10 @@ export const http = axios.create({
 
 http.interceptors.request.use((config) => {
   const token = useAuthStore.getState().token;
-  if (token && !config.skipAuth) config.headers.set("Authorization", `Bearer ${token}`);
+  // Header yang sudah diisi pemanggil (mis. GET /me tepat setelah login) tidak ditimpa.
+  if (token && !config.skipAuth && !config.headers.has("Authorization")) {
+    config.headers.set("Authorization", `Bearer ${token}`);
+  }
   return config;
 });
 
@@ -75,12 +78,13 @@ function cleanQuery(query?: Query): Query {
 }
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { method = "GET", body, query, auth = true } = options;
+  const { method = "GET", body, query, auth = true, token } = options;
   const response = await http.request<ApiEnvelope<T>>({
     url: path,
     method,
     data: body,
     params: cleanQuery(query),
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     skipAuth: !auth,
   });
   return response.data.data;
