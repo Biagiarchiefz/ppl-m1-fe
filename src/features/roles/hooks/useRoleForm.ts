@@ -15,6 +15,12 @@ export function groupByModule(permissions: Permission[]): [string, Permission[]]
 export const togglePermission = (selected: string[], perm: string) =>
   selected.includes(perm) ? selected.filter((p) => p !== perm) : [...selected, perm];
 
+// Centang semua hak akses satu modul; bila semuanya sudah tercentang, kosongkan modul itu.
+export function toggleModule(selected: string[], codes: string[]) {
+  const allChecked = codes.every((code) => selected.includes(code));
+  return allChecked ? selected.filter((p) => !codes.includes(p)) : [...new Set([...selected, ...codes])];
+}
+
 // role = null berarti peran baru (POST /roles). Untuk peran yang sudah ada,
 // backend hanya mengizinkan penggantian daftar izin (PUT /roles/{id}/permissions).
 export function useRoleForm(role: Role | null, initialPermissions: string[], onSaved: (message: string) => void) {
@@ -52,7 +58,7 @@ export function useRoleForm(role: Role | null, initialPermissions: string[], onS
   const onSubmit = handleSubmit(async (form) => {
     try {
       await mutation.mutateAsync(form);
-      onSaved(role ? `Izin peran ${role.name} berhasil diperbarui.` : "Peran baru berhasil ditambahkan.");
+      onSaved(role ? `Hak akses peran ${role.name} berhasil diperbarui.` : "Peran baru berhasil ditambahkan.");
     } catch (err) {
       applyServerErrors(err, setError, { permission_codes: "permissions" });
     }

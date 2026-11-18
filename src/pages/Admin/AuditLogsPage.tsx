@@ -1,4 +1,4 @@
-import AdminLayout from "../../layouts/AdminLayout";
+import AdminLayout from "../../layouts/AdminLayout/AdminLayout";
 import AuditLogs from "../../features/audit/components/views/AuditLogs";
 
 const AuditLogsPage = () => (

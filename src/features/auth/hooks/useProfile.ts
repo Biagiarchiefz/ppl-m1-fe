@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { errorMessage } from "../../../services/api";
 import { authKeys, getMe } from "../services/auth.service";
 import type { Me } from "../../../types";
-import { toast } from "../../../store";
+import { useLogout } from "./useLogout";
 
 export type ProfileDetailKey = "division" | "partner" | "unit" | "user";
 
@@ -33,14 +33,16 @@ export function initialOf(name: string): string {
 export function useProfile() {
   const { data, error } = useQuery({ queryKey: authKeys.me, queryFn: () => getMe() });
   const [changingPassword, setChangingPassword] = useState(false);
+  const { signOut } = useLogout();
 
   useEffect(() => {
     document.title = "Profil";
   }, []);
 
-  function onPasswordSaved(message: string) {
-    setChangingPassword(false);
-    toast.success(message);
+  // Setelah kata sandi diganti, sesi ini diakhiri (token dicabut di server)
+  // dan pengguna diminta masuk lagi dengan kata sandi baru.
+  async function onPasswordSaved(message: string) {
+    await signOut(`${message} Silakan masuk kembali dengan kata sandi baru.`);
   }
 
   return {

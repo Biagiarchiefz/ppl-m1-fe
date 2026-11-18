@@ -14,7 +14,9 @@ const ProtectedRoute = ({ superAdminOnly = false }: ProtectedRouteProps) => {
   const user = useAuthStore(selectUser);
 
   if (!token || !user) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
+    // Belum login (atau sesi sudah dihapus): ke halaman login, bukan 403.
+    // Alamat tujuan disimpan agar setelah login pengguna kembali ke sini.
+    return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />;
   }
 
   if (superAdminOnly && !isSuperAdmin(user)) {

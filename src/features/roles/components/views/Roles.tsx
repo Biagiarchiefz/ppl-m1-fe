@@ -15,8 +15,8 @@ const Roles = () => {
       <div>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl leading-tight font-medium text-text-strong">Peran &amp; Izin</h1>
-            <p className="mt-1 text-sm leading-[22px] text-text-muted">Kelola peran global platform dan pilih izin untuk tiap peran.</p>
+            <h1 className="text-2xl leading-tight font-medium text-text-strong">Peran &amp; Hak Akses</h1>
+            <p className="mt-1 text-sm leading-[22px] text-text-muted">Kelola peran global platform dan pilih hak akses untuk tiap peran.</p>
           </div>
           <button type="button" onClick={() => setDialog({ kind: "create" })} className="flex min-h-10 items-center gap-2 rounded-full efek-tekan bg-brand-primary px-4 text-sm font-semibold text-brand-on-primary hover:bg-brand-primary-strong">
             <Plus size={18} strokeWidth={1.8} />
@@ -54,7 +54,7 @@ const Roles = () => {
                     </td>
                     <td className="px-4 py-2.5 text-right">
                       {/* Satu-satunya aksi: ikon + teks agar maknanya langsung jelas. */}
-                      <RowAction icon={ShieldCheck} label="Atur izin" showLabel onClick={() => setDialog({ kind: "edit", role })} />
+                      <RowAction icon={ShieldCheck} label="Atur hak akses" showLabel onClick={() => setDialog({ kind: "edit", role })} />
                     </td>
                   </tr>
                 ))}

@@ -10,7 +10,7 @@ interface QuickLink {
 
 const links: QuickLink[] = [
   { to: "/admin/users", label: "Pengguna", description: "Tambah akun dan atur divisinya.", icon: Users },
-  { to: "/admin/roles", label: "Peran & izin", description: "Tentukan siapa boleh melakukan apa.", icon: Shield },
+  { to: "/admin/roles", label: "Peran & hak akses", description: "Tentukan siapa boleh melakukan apa.", icon: Shield },
   { to: "/admin/divisions", label: "Divisi", description: "Kelompokkan pengguna per divisi.", icon: FolderTree },
   { to: "/admin/audit-logs", label: "Audit log", description: "Telusuri riwayat perubahan.", icon: History },
 ];

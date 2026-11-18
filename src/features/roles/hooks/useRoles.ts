@@ -12,7 +12,7 @@ export function useRoles() {
   const [dialog, setDialog] = useState<RoleDialog>(null);
 
   useEffect(() => {
-    document.title = "Peran & Izin";
+    document.title = "Peran & Hak Akses";
   }, []);
 
   const { data, error, isFetching } = useQuery({

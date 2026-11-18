@@ -8,7 +8,6 @@ import type { CreateUserInput, UpdateUserInput, User, UserFormState } from "../.
 
 function initialForm(user: User | null): UserFormState {
   return {
-    partner_id: user?.partner_id == null ? "" : String(user.partner_id),
     name: user?.name ?? "",
     email: user?.email ?? "",
     password: "",
@@ -18,11 +17,11 @@ function initialForm(user: User | null): UserFormState {
   };
 }
 
-// POST /users: unit usaha kosong dikirim sebagai null (Panduan 4.5).
+// POST /users: partner_id tidak dikirim (opsional di backend, akun disimpan
+// dengan partner_id NULL); unit usaha kosong dikirim sebagai null (Panduan 4.5).
 function toCreatePayload(form: UserFormState): CreateUserInput {
   const unit = form.unit_usaha_id.trim();
   return {
-    partner_id: Number(form.partner_id.trim()),
     name: form.name,
     email: form.email,
     password: form.password,

@@ -60,7 +60,12 @@ function toApiError(status: number, payload: unknown, skipAuth = false): ApiErro
   // PRD 11: bila API menjawab 401, hapus sesi lalu arahkan ke /login.
   if (status === 401 && !skipAuth) {
     useAuthStore.getState().logout();
-    window.location.assign("/login");
+    // Sesi berakhir di tengah pemakaian: halaman asal dibawa lewat ?next agar
+    // pengguna kembali ke sana setelah masuk lagi.
+    const { pathname, search } = window.location;
+    if (pathname !== "/login") {
+      window.location.assign(`/login?${new URLSearchParams({ sesi: "berakhir", next: pathname + search })}`);
+    }
   }
   return new ApiError(
     status,

@@ -1,4 +1,4 @@
-import AdminLayout from "../../layouts/AdminLayout";
+import AdminLayout from "../../layouts/AdminLayout/AdminLayout";
 import Divisions from "../../features/divisions/components/views/Divisions";
 
 const DivisionsPage = () => (

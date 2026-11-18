@@ -1,4 +1,4 @@
-import AdminLayout from "../../layouts/AdminLayout";
+import AdminLayout from "../../layouts/AdminLayout/AdminLayout";
 import Profile from "../../features/auth/components/views/Profile";
 
 const ProfilePage = () => (

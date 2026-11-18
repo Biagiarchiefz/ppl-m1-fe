@@ -8,3 +8,5 @@ export type * from "./audit.types";
 export type * from "./dashboard.types";
 export type * from "./theme.types";
 export type * from "./ui.types";
+export type * from "./module.types";
+export type * from "./navigation.types";

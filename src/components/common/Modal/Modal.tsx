@@ -1,9 +1,12 @@
-import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useId, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { X, type LucideIcon } from "lucide-react";
+import { useEscapeKey } from "../../../hooks/useEscapeKey";
+import { useFocusTrap } from "../../../hooks/useFocusTrap";
+import { useScrollLock } from "../../../hooks/useScrollLock";
 
 type ModalTone = "default" | "danger";
-type ModalSize = "sm" | "md" | "lg";
+type ModalSize = "sm" | "md" | "lg" | "xl";
 
 interface ModalProps {
   title: string;
@@ -20,6 +23,7 @@ const sizeClasses: Record<ModalSize, string> = {
   sm: "sm:max-w-[420px]",
   md: "sm:max-w-[520px]",
   lg: "sm:max-w-[640px]",
+  xl: "sm:max-w-[820px]",
 };
 
 const toneClasses: Record<ModalTone, string> = {
@@ -27,15 +31,12 @@ const toneClasses: Record<ModalTone, string> = {
   danger: "bg-danger-soft text-danger",
 };
 
-const FOCUSABLE =
-  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-
 /**
  * Baris tombol di bawah modal. Menempel di dasar area gulir, jadi tetap terlihat
  * walau isi form panjang. Ponsel: tombol selebar layar, aksi utama di atas.
  */
 export const ModalFooter = ({ children }: { children: ReactNode }) => (
-  <div className="sticky bottom-0 z-10 -mx-5 mt-6 -mb-5 flex flex-col-reverse gap-2 border-t border-neutral-line bg-neutral-bg px-5 py-4 sm:-mx-6 sm:-mb-6 sm:flex-row sm:items-center sm:justify-end sm:px-6 [&>button]:w-full sm:[&>button]:w-auto">
+  <div className="sticky -bottom-5 z-10 -mx-5 mt-6 -mb-5 flex flex-col-reverse gap-2 border-t border-neutral-line bg-neutral-bg px-5 py-4 sm:-bottom-6 sm:-mx-6 sm:-mb-6 sm:flex-row sm:items-center sm:justify-end sm:px-6 [&>button]:w-full sm:[&>button]:w-auto">
     {children}
   </div>
 );
@@ -49,49 +50,11 @@ const Modal = ({ title, description, icon: Icon, tone = "default", size = "md", 
   const titleId = useId();
   const descriptionId = useId();
   const panelRef = useRef<HTMLElement>(null);
-  const onCloseRef = useRef(onClose);
 
-  useEffect(() => {
-    onCloseRef.current = onClose;
-  }, [onClose]);
-
-  useEffect(() => {
-    const previous = document.activeElement as HTMLElement | null;
-    const root = document.documentElement;
-    const previousOverflow = root.style.overflow;
-    root.style.overflow = "hidden";
-
-    // Fokus awal: field pertama di isi modal, atau tombol tutup bila tidak ada field.
-    const panel = panelRef.current;
-    const firstField = panel?.querySelector<HTMLElement>(`[data-modal-body] :is(${FOCUSABLE})`);
-    (firstField ?? panel?.querySelector<HTMLElement>(FOCUSABLE))?.focus();
-
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onCloseRef.current();
-        return;
-      }
-      if (e.key !== "Tab" || !panelRef.current) return;
-      const items = Array.from(panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((el) => el.offsetParent !== null);
-      if (items.length === 0) return;
-      const first = items[0];
-      const last = items[items.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      root.style.overflow = previousOverflow;
-      previous?.focus?.();
-    };
-  }, []);
+  // Fokus awal di field pertama isi modal; Escape menutup; halaman di belakang tidak ikut tergulir.
+  useFocusTrap(panelRef, { initialFocusWithin: "[data-modal-body]" });
+  useEscapeKey(onClose);
+  useScrollLock();
 
   return createPortal(
     <div

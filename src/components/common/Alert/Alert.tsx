@@ -1,18 +1,19 @@
 import type { ReactNode } from "react";
-import { CircleAlert, CircleCheck } from "lucide-react";
+import { CircleAlert, CircleCheck, Info } from "lucide-react";
 
 interface AlertProps {
   children: ReactNode;
-  tone?: "error" | "success";
+  tone?: "error" | "success" | "info";
 }
 
 const toneClasses = {
   error: "border-danger/20 bg-danger-soft text-danger",
   success: "border-success/20 bg-success-soft text-success",
+  info: "border-brand-accent/20 bg-brand-primary-soft text-brand-primary",
 };
 
 const Alert = ({ children, tone = "error" }: AlertProps) => {
-  const Icon = tone === "error" ? CircleAlert : CircleCheck;
+  const Icon = tone === "error" ? CircleAlert : tone === "info" ? Info : CircleCheck;
   return (
     <p
       role={tone === "error" ? "alert" : "status"}

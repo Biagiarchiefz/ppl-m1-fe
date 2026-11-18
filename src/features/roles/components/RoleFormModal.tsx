@@ -4,7 +4,8 @@ import Modal, { ModalFooter } from "../../../components/common/Modal/Modal";
 import Input from "../../../components/common/Input/Input";
 import Button from "../../../components/common/Button/Button";
 import Alert from "../../../components/common/Alert/Alert";
-import { groupByModule, togglePermission, useRoleForm } from "../hooks/useRoleForm";
+import FormSection from "../../../components/common/FormSection/FormSection";
+import { groupByModule, toggleModule, togglePermission, useRoleForm } from "../hooks/useRoleForm";
 import { useRolePermissions } from "../hooks/useRolePermissions";
 import type { Permission, Role } from "../../../types";
 
@@ -19,57 +20,101 @@ interface RoleFormBodyProps extends RoleFormModalProps {
   initialPermissions: string[];
 }
 
-// Form baru dirender setelah izin peran termuat, agar nilai awal checkbox benar.
+// Kode dan deskripsi peran disembunyikan bila isinya sama dengan nama (mis. "Administrator"
+// dan "administrator"), agar tidak terbaca dobel.
+const sameLabel = (name: string, code: string) => name.trim().toLowerCase().replace(/[\s_-]+/g, "") === code.toLowerCase().replace(/[\s_-]+/g, "");
+
+// Form baru dirender setelah hak akses peran termuat, agar nilai awal checkbox benar.
 const RoleFormBody = ({ role, permissions, initialPermissions, onClose, onSaved }: RoleFormBodyProps) => {
   const { register, control, errors, error, loading, onSubmit } = useRoleForm(role, initialPermissions, onSaved);
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
+    <form onSubmit={onSubmit} className="flex flex-col gap-6" noValidate>
       {error && <Alert>{error}</Alert>}
       {role ? (
-        <div className="rounded-field border border-neutral-line bg-neutral-bg p-3">
-          <p className="text-sm font-semibold text-text-default">{role.name}</p>
-          <p className="font-mono text-xs text-text-muted">{role.code}</p>
-          {role.description && <p className="mt-1 text-xs text-text-muted">{role.description}</p>}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-field border border-neutral-line bg-neutral-bg px-4 py-3">
+          <p className="text-sm font-semibold text-text-strong">{role.name}</p>
+          {!sameLabel(role.name, role.code) && <code className="rounded-full bg-neutral-soft px-2.5 py-0.5 font-mono text-xs text-text-muted">{role.code}</code>}
+          {role.description && !sameLabel(role.name, role.description) && <p className="w-full text-xs text-text-subtle">{role.description}</p>}
         </div>
       ) : (
-        <>
+        <FormSection title="Data peran">
           <Controller
             control={control}
             name="code"
             render={({ field }) => (
-              <Input label="Kode peran" id="role-code" name={field.name} ref={field.ref} value={field.value} onBlur={field.onBlur} onChange={(e) => field.onChange(e.target.value.toLowerCase())} placeholder="mis. kasir-toko" error={errors.code?.message} hint="Huruf kecil, angka, - atau _. Tidak bisa diubah setelah dibuat; dipakai di klaim token." />
+              <Input label="Kode peran" id="role-code" name={field.name} ref={field.ref} value={field.value} onBlur={field.onBlur} onChange={(e) => field.onChange(e.target.value.toLowerCase())} placeholder="mis. kasir-toko" error={errors.code?.message} hint="Huruf kecil, angka, - atau _. Tidak bisa diubah." />
             )}
           />
           <Input label="Nama peran" id="role-name" placeholder="mis. Kasir Toko" error={errors.name?.message} {...register("name")} />
-          <Input label="Deskripsi (opsional)" id="role-desc" placeholder="Tugas peran ini" error={errors.description?.message} {...register("description")} />
-        </>
+          <div className="sm:col-span-2">
+            <Input label="Deskripsi (opsional)" id="role-desc" placeholder="Tugas peran ini" error={errors.description?.message} {...register("description")} />
+          </div>
+        </FormSection>
       )}
 
       <Controller
         control={control}
         name="permissions"
-        render={({ field }) => (
-          <fieldset className="flex flex-col gap-3">
-            <legend className="mb-2 text-sm font-semibold text-text-default">Izin</legend>
-            {errors.permissions?.message && <p className="text-xs text-danger">{errors.permissions.message}</p>}
-            {permissions.length === 0 && <p className="text-sm text-text-muted">Katalog izin belum tersedia.</p>}
-            {groupByModule(permissions).map(([module, perms]) => (
-              <div key={module} className="rounded-field border border-neutral-line p-3">
-                <p className="mb-2 text-xs font-bold uppercase tracking-wide text-text-subtle">Modul {module}</p>
-                {perms.map((p) => (
-                  <label key={p.code} className="flex cursor-pointer items-start gap-2 py-1 text-sm">
-                    <input type="checkbox" checked={field.value.includes(p.code)} onChange={() => field.onChange(togglePermission(field.value, p.code))} className="mt-1 accent-brand-primary" />
-                    <span>
-                      <span className="text-text-default">{p.description}</span>
-                      <span className="block font-mono text-xs text-text-muted">{p.code}</span>
+        render={({ field }) => {
+          const selected = field.value;
+          const allCodes = permissions.map((p) => p.code);
+          const allChecked = allCodes.length > 0 && allCodes.every((code) => selected.includes(code));
+
+          return (
+            <FormSection
+              title="Hak akses"
+              aside={
+                permissions.length > 0 && (
+                  <div className="flex shrink-0 items-center gap-3 text-xs">
+                    <span className="rounded-full bg-brand-primary-soft px-2.5 py-0.5 font-medium text-brand-primary">
+                      {selected.length} dari {allCodes.length} dipilih
                     </span>
-                  </label>
-                ))}
-              </div>
-            ))}
-          </fieldset>
-        )}
+                    <button type="button" onClick={() => field.onChange(allChecked ? [] : allCodes)} className="font-medium text-link hover:underline">
+                      {allChecked ? "Kosongkan" : "Pilih semua"}
+                    </button>
+                  </div>
+                )
+              }
+            >
+              {errors.permissions?.message && <p className="text-xs text-danger sm:col-span-2">{errors.permissions.message}</p>}
+              {permissions.length === 0 && <p className="text-sm text-text-muted sm:col-span-2">Katalog hak akses belum tersedia.</p>}
+              {groupByModule(permissions).map(([module, perms]) => {
+                const codes = perms.map((p) => p.code);
+                const checkedCount = codes.filter((code) => selected.includes(code)).length;
+                const moduleChecked = checkedCount === codes.length;
+
+                return (
+                  <fieldset key={module} aria-label={`Modul ${module}`} className="flex flex-col gap-1.5 rounded-card border border-neutral-line bg-neutral-bg p-3">
+                    <div className="flex items-center justify-between gap-2 px-1 pb-1">
+                      <span className="text-xs font-semibold tracking-wide text-text-strong uppercase">Modul {module}</span>
+                      <button type="button" onClick={() => field.onChange(toggleModule(selected, codes))} className="text-xs font-medium text-link hover:underline">
+                        {moduleChecked ? "Kosongkan" : `Pilih semua (${checkedCount}/${codes.length})`}
+                      </button>
+                    </div>
+                    {perms.map((p) => {
+                      const checked = selected.includes(p.code);
+                      return (
+                        <label
+                          key={p.code}
+                          className={`flex cursor-pointer items-start gap-2.5 rounded-field border px-3 py-2 text-sm transition-colors duration-150 ${
+                            checked ? "border-brand-accent/40 bg-brand-primary-soft" : "border-transparent bg-neutral-surface hover:border-neutral-line-strong"
+                          }`}
+                        >
+                          <input type="checkbox" checked={checked} onChange={() => field.onChange(togglePermission(selected, p.code))} className="mt-0.5 size-4 shrink-0 accent-brand-primary" />
+                          <span className="min-w-0">
+                            <span className="block leading-5 text-text-default">{p.description}</span>
+                            <span className="block truncate font-mono text-[11px] text-text-subtle">{p.code}</span>
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </fieldset>
+                );
+              })}
+            </FormSection>
+          );
+        }}
       />
 
       <ModalFooter>
@@ -77,7 +122,7 @@ const RoleFormBody = ({ role, permissions, initialPermissions, onClose, onSaved 
           Batal
         </Button>
         <Button type="submit" loading={loading} className="sm:w-auto">
-          {loading ? "Menyimpan..." : "Simpan"}
+          {loading ? "Menyimpan..." : role ? "Simpan hak akses" : "Tambah peran"}
         </Button>
       </ModalFooter>
     </form>
@@ -90,10 +135,10 @@ const RoleFormModal = (props: RoleFormModalProps) => {
 
   return (
     <Modal
-      title={role ? "Atur izin peran" : "Tambah peran"}
-      description={role ? "Izin yang dipilih menggantikan seluruh izin peran ini." : "Pilih izin yang dimiliki pengguna dengan peran ini."}
+      title={role ? "Atur hak akses peran" : "Tambah peran"}
+      description={role ? "Hak akses yang dipilih menggantikan seluruh hak akses peran ini." : "Pilih hak akses yang dimiliki pengguna dengan peran ini."}
       icon={Shield}
-      size="lg"
+      size="xl"
       onClose={onClose}
     >
       {error ? (
@@ -106,7 +151,7 @@ const RoleFormModal = (props: RoleFormModalProps) => {
           </ModalFooter>
         </>
       ) : permissionCodes === null ? (
-        <p className="py-6 text-center text-sm text-text-muted">Memuat izin peran...</p>
+        <p className="py-6 text-center text-sm text-text-muted">Memuat hak akses peran...</p>
       ) : (
         <RoleFormBody {...props} initialPermissions={permissionCodes} />
       )}

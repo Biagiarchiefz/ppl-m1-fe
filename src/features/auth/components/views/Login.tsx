@@ -5,7 +5,7 @@ import Alert from "../../../../components/common/Alert/Alert";
 import { useLogin } from "../../hooks/useLogin";
 
 const Login = () => {
-  const { register, errors, error, loading, onSubmit } = useLogin();
+  const { register, errors, error, sessionExpired, loading, onSubmit } = useLogin();
 
   return (
     <>
@@ -17,7 +17,7 @@ const Login = () => {
       </header>
 
       <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-4" noValidate>
-        {error && <Alert>{error}</Alert>}
+        {error ? <Alert>{error}</Alert> : sessionExpired && <Alert tone="info">Sesi Anda telah berakhir, silakan masuk kembali.</Alert>}
         <Input
           label="Email"
           icon={Mail}

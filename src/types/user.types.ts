@@ -28,8 +28,9 @@ export interface UserFilter {
   sort?: string;
 }
 
+// partner_id tidak dikirim: akun yang dibuat super admin disimpan dengan
+// partner_id NULL. Partner (pelaku usaha) mendaftar sendiri lewat alurnya.
 export interface CreateUserInput {
-  partner_id: number;
   name: string;
   email: string;
   password: string;
@@ -48,7 +49,6 @@ export interface UpdateUserInput {
 }
 
 export interface UserFormState {
-  partner_id: string;
   name: string;
   email: string;
   password: string;
